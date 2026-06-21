@@ -1,0 +1,29 @@
+{
+  "timeZone": "America/New_York",
+  "dependencies": {
+    "enabledAdvancedServices": [{
+      "userSymbol": "AnalyticsDataAlpha",
+      "serviceId": "analyticsdata",
+      "version": "v1alpha"
+    }, {
+      "userSymbol": "AnalyticsAdmin",
+      "serviceId": "analyticsadmin",
+      "version": "v1alpha"
+    }, {
+      "userSymbol": "Drive",
+      "serviceId": "drive",
+      "version": "v2"
+    }, {
+      "userSymbol": "BigQuery",
+      "serviceId": "bigquery",
+      "version": "v2"
+    }, {
+      "userSymbol": "AnalyticsData",
+      "serviceId": "analyticsdata",
+      "version": "v1beta"
+    }]
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "oauthScopes": ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/presentations", "https://www.googleapis.com/auth/analytics.readonly", "https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/script.external_request", "https://www.googleapis.com/auth/analytics.edit", "https://www.googleapis.com/auth/analytics.manage.users", "https://www.googleapis.com/auth/bigquery", "https://www.googleapis.com/auth/script.container.ui"],
+  "runtimeVersion": "V8"
+}

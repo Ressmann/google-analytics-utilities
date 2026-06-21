@@ -39,7 +39,9 @@ const ga4Resource = {
   eventEditRules: AnalyticsAdmin.Properties.DataStreams.EventEditRules,
   subpropertyEventFilters: AnalyticsAdmin.Properties.SubpropertyEventFilters,
   rollupPropertySourceLinks: AnalyticsAdmin.Properties.RollupPropertySourceLinks,
-  calculatedMetrics: AnalyticsAdmin.Properties.CalculatedMetrics
+  calculatedMetrics: AnalyticsAdmin.Properties.CalculatedMetrics,
+  reportingDataAnnotations: AnalyticsAdmin.Properties.ReportingDataAnnotations,
+  accountChangeHistory: AnalyticsAdmin.Accounts.ChangeHistory
 };
 
 /**
@@ -59,6 +61,10 @@ function getGA4Resource(resourceKey, parent) {
       response = ga4Resource.properties.getDataRetentionSettings(parent);
     } else if (resourceKey == 'googleSignalsSettings') {
       response = ga4Resource.properties.getGoogleSignalsSettings(parent);
+    } else if (resourceKey == 'dataRedactionSettings') {
+      response = ga4Resource.properties.DataStreams.getDataRedactionSettings(parent);
+    } else if (resourceKey == 'reportingIdentitySettings') {
+      response = AnalyticsAdmin.Properties.getReportingIdentitySettings(parent);
     } else {
       response = ga4Resource[resourceKey].get(parent);
     }
@@ -155,6 +161,9 @@ function createGA4Entity(resourceKey, name, payload) {
       response = ga4Resource.properties.provisionSubproperty(payload);
     } else if (resourceKey == 'rollupProperties') {
       response = ga4Resource.properties.createRollupProperty(payload);
+    } else if (resourceKey == 'calculatedMetrics') {
+      response = ga4Resource[resourceKey].create(
+        payload, name, { calculatedMetricId: payload.calculatedMetricId });
     } else {
       response = ga4Resource[resourceKey].create(payload, name);
     }
@@ -176,6 +185,7 @@ function deleteGA4Entity(resourceKey, name) {
     }
 		Utilities.sleep(ga4RequestDelay);
 		return response;
+
   } catch(e) {
     console.log(e);
     return e;
@@ -199,24 +209,32 @@ function updateGA4Entity(resourceKey, name, payload) {
       }
     } else if (resourceKey == 'attributionSettings') {
       mask = 'acquisitionConversionEventLookbackWindow,otherConversionEventLookbackWindow,reportingAttributionModel';
+    } else if (resourceKey == 'reportingIdentitySettings') {
+      mask = 'reportingIdentity';
     } else {
       mask = '*';
     }
+    
     if (resourceKey == 'accountAccessBindings' || 
       resourceKey == 'propertyAccessBindings') {
       response = ga4Resource[resourceKey].patch(payload, name);
-    } else if (resourceKey = 'dataRetentionSettings') {
+    } else if (resourceKey == 'dataRetentionSettings') {
       response = ga4Resource.properties.updateDataRetentionSettings(
         payload, name, {updateMask: mask}
       );
-    } else if (resourceKey = 'attributionSettings') {
+    } else if (resourceKey == 'attributionSettings') {
       response = ga4Resource.properties.updateAttributionSettings(
         payload, name, {updateMask: mask}
       );
-    } else if (resourceKey = 'enhancedMeasurementSettings') {
+    } else if (resourceKey == 'enhancedMeasurementSettings') {
       response = ga4Resource.streams.updateEnhancedMeasurementSettings(
         payload, name, {updateMask: mask}
       );
+    } else if (resourceKey == 'dataRedactionSettings') {
+      mask = Object.keys(payload).join(',');
+      response = AnalyticsAdmin.Properties.DataStreams.updateDataRedactionSettings(payload, name, { updateMask: mask });
+    } else if (resourceKey == 'reportingIdentitySettings') {
+      response = AnalyticsAdmin.Properties.updateReportingIdentitySettings(payload, name, {updateMask: mask});
     } else {
       response = ga4Resource[resourceKey].patch(
         payload, name, {updateMask: mask});
@@ -232,17 +250,19 @@ function updateGA4Entity(resourceKey, name, payload) {
 /**
  * Updates the data retention settings for a property.
  * @param {string} evenDataRetention The length of time data should be retained.
+ * @param {string} userDataRetention The length of time user data should be retained.
  * @param {boolean} resetUserDataOnNewActivity Whether or not user data should
  * be reset on new activity.
  * @param {string} parent The parent data stream path.
  * @returns {!Object} Either the updated data retention setting or an error.
  */
 function updateDataRetentionSettings(
-  evenDataRetention, resetUserDataOnNewActivity, parent) {
+  evenDataRetention, userDataRetention, resetUserDataOnNewActivity, parent) {
   try {
     let response = '';
     response = AnalyticsAdmin.Properties.updateDataRetentionSettings({
       eventDataRetention: evenDataRetention,
+      userDataRetention: userDataRetention,
       resetUserDataOnNewActivity: resetUserDataOnNewActivity
     }, parent, {updateMask: '*'});
 		Utilities.sleep(ga4RequestDelay);
@@ -271,4 +291,3 @@ function updateEnhancedMeasurementSettings(settings, parent) {
     return e;
   }
 }
-          

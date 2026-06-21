@@ -40,6 +40,9 @@ function listSelectedGA4Properties(selectedProperties) {
               'dataRetentionSettings', prop.name + '/dataRetentionSettings');
             const googleSignalsSettings = getGA4Resource(
               'googleSignalsSettings', prop.name + '/googleSignalsSettings');
+            const reportingIdentitySettings = getGA4Resource(
+              'reportingIdentitySettings', prop.name + '/reportingIdentitySettings');
+              
             let eventCount = 0;
             let eventRows = null;
             let sourceProperties = '';
@@ -91,10 +94,12 @@ function listSelectedGA4Properties(selectedProperties) {
               eventCount,
               googleSignalsSettings.state,
               dataRetentionSettings.eventDataRetention,
+              dataRetentionSettings.userDataRetention,
               dataRetentionSettings.resetUserDataOnNewActivity || false,
               attributionSettings.acquisitionConversionEventLookbackWindow,
               attributionSettings.otherConversionEventLookbackWindow,
-              attributionSettings.reportingAttributionModel
+              attributionSettings.reportingAttributionModel,
+              reportingIdentitySettings.reportingIdentity || ''
             ]
             arr.push(subArray);
             return arr;

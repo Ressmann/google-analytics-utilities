@@ -1,21 +1,10 @@
-/**
- * Copyright 2024 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 function onOpen(e) {
   const ui = SpreadsheetApp.getUi();
   ui.createMenu('Google Analytics Utilities')
+    //--New update
+    .addItem('Show Sidebar', 'showSidebar')
+    .addSeparator()
+    //--End update
     // Selectors
     .addItem('List Account Summaries', 'writeGA4AccountSummariesToSheet')
     .addItem('List Data Stream Selection', 'writeDataStreamSelectionToSheet')
@@ -107,6 +96,10 @@ function onOpen(e) {
         ui.createMenu('Rollup Property Source Links')
         .addItem('List', 'writeGA4RollupPropertySourceLinksToSheet')
         .addItem('Modify', 'modifyRollupPropertySourceLinks'))
+    .addSubMenu(
+      ui.createMenu('Annotations')
+        .addItem('List', 'writeGA4AnnotationsToSheet')
+        .addItem('Modify', 'modifyGA4Annotations'))
       .addSeparator()
       .addSubMenu(
         ui.createMenu('Advanced')
@@ -130,7 +123,25 @@ function onOpen(e) {
           ui.createMenu('User Access Report')
           .addItem('Run Report', 'writeUserAccessReportDataToSheet')))
       .addItem('List All Property Settings', 'listAllGA4PropertyResources')
+    .addItem('List Account Change History', 'listAccountHistory')
     .addSeparator()
     .addItem('Check for Updates', 'checkRelease')
     .addToUi();
 }
+
+//--New update
+/**
+ * Opens the sidebar UI.
+ */
+function showSidebar() {
+  try {
+    const html = HtmlService.createHtmlOutputFromFile('sidebar')
+        .setTitle('GA Utilities Navigation')
+        .setWidth(300);
+    SpreadsheetApp.getUi().showSidebar(html);
+  } catch (err) {
+    // If it fails, it will pop up a notification in your Google Sheet
+    SpreadsheetApp.getActiveSpreadsheet().toast('Error loading sidebar: ' + err.message, 'Sidebar Error', -1);
+  }
+}
+//--End update

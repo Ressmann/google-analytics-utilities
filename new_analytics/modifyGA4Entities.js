@@ -151,7 +151,7 @@ function modifySubpropertyEventFilters() {
  * Modifies calculated metrics.
  */
 function modifyCalculatedMetrics() {
-  modifyGA4Entities(sheetsMeta.ga4.subpropertyEventFilters.sheetName);
+  modifyGA4Entities(sheetsMeta.ga4.calculatedMetrics.sheetName);
 }
 
 /**
@@ -169,6 +169,15 @@ function modifyBigQueryLinks() {
 }
 
 /**
+ * Modifies Annotations.
+ */
+function modifyGA4Annotations() {
+  modifyGA4Entities(sheetsMeta.ga4.reportingDataAnnotations.sheetName);
+}
+
+
+
+/**
  * Loops through the rows on the sheet with data and checks either
  * skips, updates, removes, or creates an entity depending on what
  * was checked in a given sheet.
@@ -176,9 +185,12 @@ function modifyBigQueryLinks() {
  * the data will be retrieved.
  */
 function modifyGA4Entities(sheetName) {
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName).activate();
   let entities = getDataFromSheet(sheetName);
   let ga4Resource = Object.keys(sheetsMeta.ga4).find(
     key => sheetsMeta.ga4[key].sheetName === sheetName);
+
+
   if (entities.length > 0) {
     entities.forEach((entity, index) => {
       const responses = [];
@@ -243,6 +255,7 @@ function modifyGA4Entities(sheetName) {
             responses.push(deleteGA4Entity(ga4Resource, resourceName))
           } else {
             responses.push(deleteGA4Entity(ga4Resource, resourceName));
+           
           }
           actionTaken = responseCheck(responses, 'delete');
         }
@@ -252,14 +265,15 @@ function modifyGA4Entities(sheetName) {
       // Creates the new entity.
       } else if (create) {
         const payload = buildCreatePayload(sheetName, entity);
+
         if (ga4Resource == 'properties') {
           let createResponse = '';
           if (entity[4] == 'PROPERTY_TYPE_SUBPROPERTY') {
             const subpropertyEventFilter = JSON.parse(entity[7]);
             delete subpropertyEventFilter.name;
             payload.propertyType = entity[4];
+            payload.parent = entity[5];
             const subpropertySettings = {
-              parent: entity[5],
               subproperty: payload,
               subpropertyEventFilter: subpropertyEventFilter
             };
@@ -270,23 +284,38 @@ function modifyGA4Entities(sheetName) {
               rollupProperty: payload,
               sourceProperties: entity[6].split(',').map(id => id.trim())
             };
-            createResponse = createGA4Entity('rollupProperties', '', rollupSettings);
+            createResponse = createGA4Entity('rollupProperties', '', rollupSettings).rollupProperty;
             responses.push(createResponse);
           } else {
-            createResponse = createGA4Entity(ga4Resource, parent, payload).rollupProperty;
+            createResponse = createGA4Entity(ga4Resource, parent, payload);
             responses.push(createResponse);
           }
-          if (entity[16] != 'TWO_MONTHS' || entity[17] != false) {
+          if (entity[16] != 'TWO_MONTHS' || entity[17] != 'TWO_MONTHS' || entity[18] != false) {
             responses.push(
-              updateDataRetentionSettings(entity[16], entity[17],
+              updateDataRetentionSettings(entity[16], entity[17], entity[18],
                 createResponse.name + '/dataRetentionSettings'));
           }
 
         } else if (ga4Resource == 'streams' && payload.webStreamData) {
-          responses.push(createGA4Entity(ga4Resource, parent, payload));
-          responses.push(updateEnhancedMeasurementSettings(
-            buildEnhancedMeasurementSettingsPayload(entity),
-            `${entity[5]}/enhancedMeasurementSettings`));
+        const createResponse = createGA4Entity(ga4Resource, parent, payload);
+        responses.push(createResponse);
+        const newStreamPath = createResponse.name;
+        Utilities.sleep(2000);
+        
+        responses.push(updateEnhancedMeasurementSettings(
+          buildEnhancedMeasurementSettingsPayload(entity), `${newStreamPath}/enhancedMeasurementSettings`));
+          
+        const redactionPayload = {
+          emailRedactionEnabled: entity[24],
+          queryParameterRedactionEnabled: entity[25]
+          };
+        
+        if (entity[26] && entity[26].toString().trim() !== '') {
+          redactionPayload.queryParameterKeys = entity[26].split(',').map(key => key.trim());
+          }
+        responses.push(updateGA4Entity('dataRedactionSettings', `${newStreamPath}/dataRedactionSettings`, redactionPayload)); 
+
+        
         } else {
           const createResponse = createGA4Entity(ga4Resource, parent, payload);
           responses.push(createResponse);
@@ -297,16 +326,40 @@ function modifyGA4Entities(sheetName) {
       // Updates entities.
       } else if (update) {
         const payload = buildUpdatePayload(sheetName, entity);
+        
+        let reportingIdentity = null;
+        if (ga4Resource == 'properties' && payload.reportingIdentity) {
+          reportingIdentity = payload.reportingIdentity;
+          delete payload.reportingIdentity;
+        }
+
         responses.push(
           updateGA4Entity(ga4Resource, resourceName, payload, index));
         if (ga4Resource == 'properties') {
           responses.push(
-            updateDataRetentionSettings(entity[16], entity[17],
+            updateDataRetentionSettings(entity[16], entity[17], entity[18],
             resourceName + '/dataRetentionSettings'));
+            
+          if (reportingIdentity) {
+            responses.push(
+              updateGA4Entity('reportingIdentitySettings', `${resourceName}/reportingIdentitySettings`, { reportingIdentity: reportingIdentity })
+            );
+          }
+            
         } else if (ga4Resource == 'streams' && payload.webStreamData) {
           responses.push(updateEnhancedMeasurementSettings(
             buildEnhancedMeasurementSettingsPayload(entity),
             `${entity[5]}/enhancedMeasurementSettings`));
+            
+          const redactionPayload = {
+            emailRedactionEnabled: entity[24],
+            queryParameterRedactionEnabled: entity[25]
+          };
+          
+          if (entity[26] && entity[26].toString().trim() !== '') {
+            redactionPayload.queryParameterKeys = entity[26].split(',').map(key => key.trim());
+          }
+            responses.push(updateGA4Entity('dataRedactionSettings', `${resourceName}/dataRedactionSettings`, redactionPayload));
         }
         actionTaken = responseCheck(responses, 'update');
         writeActionTakenToSheet(sheetName, index, actionTaken);
@@ -323,8 +376,10 @@ function modifyGA4Entities(sheetName) {
  * inner array contains metadata about a given entity.
  */
 function buildCreatePayload(sheetName, entity) {
+
   const payload = {};
   const entityDisplayNameOrId = entity[4];
+
   if (sheetName == sheetsMeta.ga4.customDimensions.sheetName ||
   sheetName == sheetsMeta.ga4.customMetrics.sheetName) {
     // Add custom dimension or metric fields.
@@ -453,12 +508,11 @@ function buildCreatePayload(sheetName, entity) {
     payload.parameterMutations = JSON.parse(entity[10] || '[]');
   } else if (sheetName == sheetsMeta.ga4.eventEditRules.sheetName) {
     payload.displayName = entity[6];
-    payload.sourceCopyParameters = entity[8];
     payload.eventConditions = JSON.parse(entity[9] || '[]');
     payload.parameterMutations = JSON.parse(entity[10] || '[]');
   } else if (sheetName == sheetsMeta.ga4.subpropertyEventFilters.sheetName) {
     payload.applyToProperty = entity[4];
-    payload.filterClauses = entity[6];
+    payload.filterClauses = JSON.parse(entity[6]);
   } else if (sheetName == sheetsMeta.ga4.rollupPropertySourceLinks.sheetName) {
     payload.sourceProperty = entity[4];
   } else if (sheetName == sheetsMeta.ga4.bigqueryLinks.sheetName) {
@@ -470,6 +524,33 @@ function buildCreatePayload(sheetName, entity) {
     payload.streamingExportEnabled = entity[11];
     payload.freshDailyExportEnabled = entity[12];
     payload.datasetLocation = entity[13];
+  } else if (sheetName == sheetsMeta.ga4.calculatedMetrics.sheetName) {
+    payload.displayName = entityDisplayNameOrId;
+    payload.description = entity[6];
+    payload.calculatedMetricId = entity[7];
+    payload.metricUnit = entity[8];
+    payload.formula = entity[10];
+  } else if (sheetName == sheetsMeta.ga4.reportingDataAnnotations.sheetName) {
+
+    if(entity[10]) {
+      payload.annotationDateRange = {};
+      payload.annotationDateRange.startDate = {};
+      payload.annotationDateRange.endDate = {};
+      payload.annotationDateRange.startDate.year = entity[9].getFullYear();
+      payload.annotationDateRange.startDate.month = entity[9].getMonth() + 1;   // adding +1 because months start from 0 (January = 0)
+      payload.annotationDateRange.startDate.day = entity[9].getDate();
+      payload.annotationDateRange.endDate.year = entity[10].getFullYear();
+      payload.annotationDateRange.endDate.month = entity[10].getMonth() + 1;   // adding +1 because months start from 0 (January = 0)
+      payload.annotationDateRange.endDate.day = entity[10].getDate();
+    } else {
+      payload.annotationDate = {};
+      payload.annotationDate.year = entity[9].getFullYear();
+      payload.annotationDate.month = entity[9].getMonth() + 1;   // adding +1 because months start from 0 (January = 0)
+      payload.annotationDate.day = entity[9].getDate();
+    }
+    payload.title = entityDisplayNameOrId;
+    payload.description = entity[6];
+    payload.color = entity[8];
   }
   return payload;
 }
@@ -514,7 +595,8 @@ function buildUpdatePayload(sheetName, entity) {
     payload.displayName = entity[2];
     payload.industryCategory = entity[10];
     payload.timeZone = entity[11];
-    payload.currencyCode = entity[12]
+    payload.currencyCode = entity[12];
+    payload.reportingIdentity = entity[22];
   } else if (sheetName == sheetsMeta.ga4.streams.sheetName) {
     payload.displayName = entity[4];
     if (entity[6] == 'WEB_DATA_STREAM') {
@@ -580,7 +662,7 @@ function buildUpdatePayload(sheetName, entity) {
     payload.eventConditions = JSON.parse(entity[9] || '[]');
     payload.parameterMutations = JSON.parse(entity[10] || '[]');
   } else if (sheetName == sheetsMeta.ga4.subpropertyEventFilters.sheetName) {
-    payload.filterClauses = entity[6];
+    payload.filterClauses = JSON.parse(entity[6]);
   } else if (sheetName == sheetsMeta.ga4.bigqueryLinks.sheetName) {
     payload.dailyExportEnabled = entity[7];
     payload.excludedEvents = entity[8].split(',');
@@ -588,6 +670,32 @@ function buildUpdatePayload(sheetName, entity) {
     payload.includeAdvertisingId = entity[10];
     payload.streamingExportEnabled = entity[11];
     payload.freshDailyExportEnabled = entity[12];
+  } else if (sheetName == sheetsMeta.ga4.calculatedMetrics.sheetName) {
+    payload.displayName = entityDisplayNameOrId;
+    payload.description = entity[6];
+    payload.metricUnit = entity[8];
+    payload.formula = entity[10];
+  } else if (sheetName == sheetsMeta.ga4.reportingDataAnnotations.sheetName) {
+
+    if(entity[10]) {
+      payload.annotationDateRange = {};
+      payload.annotationDateRange.startDate = {};
+      payload.annotationDateRange.endDate = {};
+      payload.annotationDateRange.startDate.year = entity[9].getFullYear();
+      payload.annotationDateRange.startDate.month = entity[9].getMonth() + 1;   // adding +1 because months start from 0 (January = 0)
+      payload.annotationDateRange.startDate.day = entity[9].getDate();
+      payload.annotationDateRange.endDate.year = entity[10].getFullYear();
+      payload.annotationDateRange.endDate.month = entity[10].getMonth() + 1;   // adding +1 because months start from 0 (January = 0)
+      payload.annotationDateRange.endDate.day = entity[10].getDate();
+    } else {
+      payload.annotationDate = {};
+      payload.annotationDate.year = entity[9].getFullYear();
+      payload.annotationDate.month = entity[9].getMonth() + 1;   // adding +1 because months start from 0 (January = 0)
+      payload.annotationDate.day = entity[9].getDate();
+    }
+    payload.title = entityDisplayNameOrId;
+    payload.description = entity[6];
+    payload.color = entity[8];
   }
   return payload;
 }
