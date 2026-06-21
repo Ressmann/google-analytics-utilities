@@ -415,6 +415,21 @@ const sheetsMeta = {
         numColumns: 11
       }
     },
+    sKAdConversionSchemas: {
+      sheetName: 'sKAd Conversion Schemas',
+      write: {
+        row: 2,
+        column: 1,
+        numRows: 1,
+        numColumns: 11
+      },
+      read: {
+        row: 2,
+        column: 1,
+        numRows: 1,
+        numColumns: 15
+      }
+    },
     calculatedMetrics: {
       sheetName: 'Calculated Metrics',
       write: {

@@ -148,6 +148,13 @@ function modifySubpropertyEventFilters() {
 }
 
 /**
+ * Modifies SKAdNetwork conversion value schemas.
+ */
+function modifySKAdConversionSchemas() {
+  modifyGA4Entities(sheetsMeta.ga4.sKAdConversionSchemas.sheetName);
+}
+
+/**
  * Modifies calculated metrics.
  */
 function modifyCalculatedMetrics() {
@@ -218,6 +225,9 @@ function modifyGA4Entities(sheetName) {
       } else if (sheetName == sheetsMeta.ga4.eventEditRules.sheetName) {
         parent = `properties/${entity[3]}/dataStreams/${entity[5]}`;
         resourceName = entity[7];
+      } else if (sheetName == sheetsMeta.ga4.sKAdConversionSchemas.sheetName) {
+        parent = `properties/${entity[3]}/dataStreams/${entity[5]}`;
+        resourceName = entity[6];
       } else {
         parent = 'properties/' + entity[3];
         resourceName = entity[5];
@@ -328,6 +338,10 @@ function modifyGA4Entities(sheetName) {
         } else {
           const createResponse = createGA4Entity(ga4Resource, parent, payload);
           responses.push(createResponse);
+          if (sheetName == sheetsMeta.ga4.sKAdConversionSchemas.sheetName && createResponse && createResponse.name) {
+            const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+            sheet.getRange(index + 2, 7).setValue(createResponse.name);
+          }
         }
         actionTaken = responseCheck(responses, 'create');
         writeActionTakenToSheet(sheetName, index, actionTaken);
@@ -570,6 +584,17 @@ function buildCreatePayload(sheetName, entity) {
     payload.title = entityDisplayNameOrId;
     payload.description = entity[6];
     payload.color = entity[8];
+  } else if (sheetName == sheetsMeta.ga4.sKAdConversionSchemas.sheetName) {
+    if (entity[7] && entity[7].toString().trim() !== '') {
+      payload.postbackWindowOne = JSON.parse(entity[7]);
+    }
+    if (entity[8] && entity[8].toString().trim() !== '') {
+      payload.postbackWindowTwo = JSON.parse(entity[8]);
+    }
+    if (entity[9] && entity[9].toString().trim() !== '') {
+      payload.postbackWindowThree = JSON.parse(entity[9]);
+    }
+    payload.applyConversionValues = entity[10] === true || entity[10] === 'true';
   }
   return payload;
 }
@@ -715,6 +740,17 @@ function buildUpdatePayload(sheetName, entity) {
     payload.title = entityDisplayNameOrId;
     payload.description = entity[6];
     payload.color = entity[8];
+  } else if (sheetName == sheetsMeta.ga4.sKAdConversionSchemas.sheetName) {
+    if (entity[7] && entity[7].toString().trim() !== '') {
+      payload.postbackWindowOne = JSON.parse(entity[7]);
+    }
+    if (entity[8] && entity[8].toString().trim() !== '') {
+      payload.postbackWindowTwo = JSON.parse(entity[8]);
+    }
+    if (entity[9] && entity[9].toString().trim() !== '') {
+      payload.postbackWindowThree = JSON.parse(entity[9]);
+    }
+    payload.applyConversionValues = entity[10] === true || entity[10] === 'true';
   }
   return payload;
 }

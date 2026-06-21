@@ -93,6 +93,10 @@ function onOpen(e) {
         .addItem('List', 'writeGA4SubpropertyEventFiltersToSheet')
         .addItem('Modify', 'modifySubpropertyEventFilters'))
       .addSubMenu(
+        ui.createMenu('sKAd Conversion Schemas')
+        .addItem('List', 'writeSKAdConversionSchemasToSheet')
+        .addItem('Modify', 'modifySKAdConversionSchemas'))
+      .addSubMenu(
         ui.createMenu('Rollup Property Source Links')
         .addItem('List', 'writeGA4RollupPropertySourceLinksToSheet')
         .addItem('Modify', 'modifyRollupPropertySourceLinks'))

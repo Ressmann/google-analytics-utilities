@@ -37,6 +37,7 @@ const ga4Resource = {
   adSenseLinks: AnalyticsAdmin.Properties.AdSenseLinks,
   eventCreateRules: AnalyticsAdmin.Properties.DataStreams.EventCreateRules,
   eventEditRules: AnalyticsAdmin.Properties.DataStreams.EventEditRules,
+  sKAdConversionSchemas: AnalyticsAdmin.Properties.DataStreams.SKAdNetworkConversionValueSchema,
   subpropertyEventFilters: AnalyticsAdmin.Properties.SubpropertyEventFilters,
   subpropertySyncConfigs: AnalyticsAdmin.Properties.SubpropertySyncConfigs,
   rollupPropertySourceLinks: AnalyticsAdmin.Properties.RollupPropertySourceLinks,
@@ -101,6 +102,9 @@ function listGA4Entities(resourceKey, parent) {
       } else if (resourceKey == 'connectedSiteTags') {
         delete parent.pageSize;
         response = ga4Resource.properties.listConnectedSiteTags(parent); 
+      } else if (resourceKey == 'sKAdConversionSchemas') {
+        items = 'skadnetworkConversionValueSchemas';
+        response = ga4Resource[resourceKey].list(parent, options);
       } else {
         response = ga4Resource[resourceKey].list(parent, options);
       }
@@ -124,6 +128,9 @@ function listGA4Entities(resourceKey, parent) {
           delete parent.pageSize;
           nextPageResponse = ga4Resource
             .properties.listConnectedSiteTags(parent); 
+        } else if (resourceKey == 'sKAdConversionSchemas') {
+          items = 'skadnetworkConversionValueSchemas';
+          nextPageResponse = ga4Resource[resourceKey].list(parent, options);
         } else {
           nextPageResponse = ga4Resource[resourceKey].list(parent, options);
         }
