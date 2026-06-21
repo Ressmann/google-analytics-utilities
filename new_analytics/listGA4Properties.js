@@ -42,12 +42,15 @@ function listSelectedGA4Properties(selectedProperties) {
               'googleSignalsSettings', prop.name + '/googleSignalsSettings');
             const reportingIdentitySettings = getGA4Resource(
               'reportingIdentitySettings', prop.name + '/reportingIdentitySettings');
+            const userProvidedDataSettings = getGA4Resource(
+              'userProvidedDataSettings', prop.name + '/userProvidedDataSettings');
               
             let eventCount = 0;
             let eventRows = null;
             let sourceProperties = '';
             let subpropertyFilter = '';
             let subpropertyParent = '';
+            let subpropertySyncConfig = '';
             try {
               eventRows = AnalyticsData.Properties.runReport(
                 request, prop.name).rows;
@@ -75,6 +78,25 @@ function listSelectedGA4Properties(selectedProperties) {
               if (subpropertyFilter != undefined && subpropertyFilter != '') {
                 subpropertyFilter = JSON.stringify(subpropertyFilter);
               }
+              // Fetch subproperty sync config
+              const ordinaryPropertyId = prop.parent.split('/')[1];
+              const subpropertyId = prop.name.split('/')[1];
+              const syncConfigPath = 'properties/' + ordinaryPropertyId + '/subpropertySyncConfigs/' + subpropertyId;
+              const syncConfigResponse = getGA4Resource('subpropertySyncConfigs', syncConfigPath);
+              if (syncConfigResponse && !(syncConfigResponse instanceof Error) && syncConfigResponse.customDimensionAndMetricSyncMode) {
+                subpropertySyncConfig = syncConfigResponse.customDimensionAndMetricSyncMode;
+              }
+            }
+            let userProvidedDataCollectionEnabled = '';
+            let automaticallyDetectedDataCollectionEnabled = '';
+            if (userProvidedDataSettings && !(userProvidedDataSettings instanceof Error)) {
+              userProvidedDataCollectionEnabled = userProvidedDataSettings.userProvidedDataCollectionEnabled !== undefined ?
+                  userProvidedDataSettings.userProvidedDataCollectionEnabled : false;
+              automaticallyDetectedDataCollectionEnabled = userProvidedDataSettings.automaticallyDetectedDataCollectionEnabled !== undefined ?
+                  userProvidedDataSettings.automaticallyDetectedDataCollectionEnabled : false;
+            } else if (userProvidedDataSettings instanceof Error) {
+              userProvidedDataCollectionEnabled = 'Error';
+              automaticallyDetectedDataCollectionEnabled = 'Error';
             }
             const subArray = [
               property[0],
@@ -85,6 +107,7 @@ function listSelectedGA4Properties(selectedProperties) {
               prop.parent,
               sourceProperties,
               subpropertyFilter,
+              subpropertySyncConfig,
               prop.createTime,
               prop.updateTime,
               prop.industryCategory,
@@ -99,7 +122,9 @@ function listSelectedGA4Properties(selectedProperties) {
               attributionSettings.acquisitionConversionEventLookbackWindow,
               attributionSettings.otherConversionEventLookbackWindow,
               attributionSettings.reportingAttributionModel,
-              reportingIdentitySettings.reportingIdentity || ''
+              reportingIdentitySettings.reportingIdentity || '',
+              userProvidedDataCollectionEnabled,
+              automaticallyDetectedDataCollectionEnabled
             ]
             arr.push(subArray);
             return arr;

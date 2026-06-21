@@ -38,6 +38,7 @@ const ga4Resource = {
   eventCreateRules: AnalyticsAdmin.Properties.DataStreams.EventCreateRules,
   eventEditRules: AnalyticsAdmin.Properties.DataStreams.EventEditRules,
   subpropertyEventFilters: AnalyticsAdmin.Properties.SubpropertyEventFilters,
+  subpropertySyncConfigs: AnalyticsAdmin.Properties.SubpropertySyncConfigs,
   rollupPropertySourceLinks: AnalyticsAdmin.Properties.RollupPropertySourceLinks,
   calculatedMetrics: AnalyticsAdmin.Properties.CalculatedMetrics,
   reportingDataAnnotations: AnalyticsAdmin.Properties.ReportingDataAnnotations,
@@ -65,6 +66,8 @@ function getGA4Resource(resourceKey, parent) {
       response = ga4Resource.properties.DataStreams.getDataRedactionSettings(parent);
     } else if (resourceKey == 'reportingIdentitySettings') {
       response = AnalyticsAdmin.Properties.getReportingIdentitySettings(parent);
+    } else if (resourceKey == 'userProvidedDataSettings') {
+      response = AnalyticsAdmin.Properties.getUserProvidedDataSettings(parent);
     } else {
       response = ga4Resource[resourceKey].get(parent);
     }
@@ -211,6 +214,8 @@ function updateGA4Entity(resourceKey, name, payload) {
       mask = 'acquisitionConversionEventLookbackWindow,otherConversionEventLookbackWindow,reportingAttributionModel';
     } else if (resourceKey == 'reportingIdentitySettings') {
       mask = 'reportingIdentity';
+    } else if (resourceKey == 'subpropertySyncConfigs') {
+      mask = 'custom_dimension_and_metric_sync_mode';
     } else {
       mask = '*';
     }

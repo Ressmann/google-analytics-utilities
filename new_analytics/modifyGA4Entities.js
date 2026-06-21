@@ -279,6 +279,15 @@ function modifyGA4Entities(sheetName) {
             };
             createResponse = createGA4Entity('subproperties', '', subpropertySettings).subproperty;
             responses.push(createResponse);
+            if (entity[8] && entity[8] !== '') {
+              const ordinaryPropertyId = entity[5].split('/')[1];
+              const subpropertyId = createResponse.name.split('/')[1];
+              const syncConfigPath = 'properties/' + ordinaryPropertyId + '/subpropertySyncConfigs/' + subpropertyId;
+              const syncConfigPayload = {
+                customDimensionAndMetricSyncMode: entity[8].toString().trim().toUpperCase()
+              };
+              responses.push(updateGA4Entity('subpropertySyncConfigs', syncConfigPath, syncConfigPayload));
+            }
           } else if (entity[4] == 'PROPERTY_TYPE_ROLLUP') {
             const rollupSettings = {
               rollupProperty: payload,
@@ -290,9 +299,9 @@ function modifyGA4Entities(sheetName) {
             createResponse = createGA4Entity(ga4Resource, parent, payload);
             responses.push(createResponse);
           }
-          if (entity[16] != 'TWO_MONTHS' || entity[17] != 'TWO_MONTHS' || entity[18] != false) {
+          if (entity[17] != 'TWO_MONTHS' || entity[18] != 'TWO_MONTHS' || entity[19] != false) {
             responses.push(
-              updateDataRetentionSettings(entity[16], entity[17], entity[18],
+              updateDataRetentionSettings(entity[17], entity[18], entity[19],
                 createResponse.name + '/dataRetentionSettings'));
           }
 
@@ -337,13 +346,23 @@ function modifyGA4Entities(sheetName) {
           updateGA4Entity(ga4Resource, resourceName, payload, index));
         if (ga4Resource == 'properties') {
           responses.push(
-            updateDataRetentionSettings(entity[16], entity[17], entity[18],
+            updateDataRetentionSettings(entity[17], entity[18], entity[19],
             resourceName + '/dataRetentionSettings'));
             
           if (reportingIdentity) {
             responses.push(
               updateGA4Entity('reportingIdentitySettings', `${resourceName}/reportingIdentitySettings`, { reportingIdentity: reportingIdentity })
             );
+          }
+
+          if (entity[4] == 'PROPERTY_TYPE_SUBPROPERTY' && entity[8] && entity[8] !== '') {
+            const ordinaryPropertyId = entity[5].split('/')[1];
+            const subpropertyId = entity[3];
+            const syncConfigPath = 'properties/' + ordinaryPropertyId + '/subpropertySyncConfigs/' + subpropertyId;
+            const syncConfigPayload = {
+              customDimensionAndMetricSyncMode: entity[8].toString().trim().toUpperCase()
+            };
+            responses.push(updateGA4Entity('subpropertySyncConfigs', syncConfigPath, syncConfigPayload));
           }
             
         } else if (ga4Resource == 'streams' && payload.webStreamData) {
@@ -424,9 +443,9 @@ function buildCreatePayload(sheetName, entity) {
   } else if (sheetName == sheetsMeta.ga4.properties.sheetName) {
     // Add fields to modify a property.
     payload.displayName = entity[2];
-    payload.industryCategory = entity[10];
-    payload.timeZone = entity[11];
-    payload.currencyCode = entity[12];
+    payload.industryCategory = entity[11];
+    payload.timeZone = entity[12];
+    payload.currencyCode = entity[13];
   } else if (sheetName == sheetsMeta.ga4.streams.sheetName) {
     payload.displayName = entity[4];
     payload.type = entity[6];
@@ -593,10 +612,10 @@ function buildUpdatePayload(sheetName, entity) {
   } else if (sheetName == sheetsMeta.ga4.properties.sheetName) {
     // Add fields to modify a property.
     payload.displayName = entity[2];
-    payload.industryCategory = entity[10];
-    payload.timeZone = entity[11];
-    payload.currencyCode = entity[12];
-    payload.reportingIdentity = entity[22];
+    payload.industryCategory = entity[11];
+    payload.timeZone = entity[12];
+    payload.currencyCode = entity[13];
+    payload.reportingIdentity = entity[23];
   } else if (sheetName == sheetsMeta.ga4.streams.sheetName) {
     payload.displayName = entity[4];
     if (entity[6] == 'WEB_DATA_STREAM') {
