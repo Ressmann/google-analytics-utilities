@@ -128,17 +128,18 @@
     <div id="status">&nbsp;</div>
 
     <details open>
-      <summary>General / Selectors</summary>
+      <summary>Setup & Discovery</summary>
       <div class="group">
         <div class="group-title">Account Summaries <span class="jump-link" onclick="jumpToTab('Account Summaries')" title="Go to sheet">↗ Open</span></div>
         <button class="action-btn" onclick="runFunc('writeGA4AccountSummariesToSheet', 'Account Summaries')">List Account Summaries</button>
-        
-        <div class="group-title">Data Stream Selection <span class="jump-link" onclick="jumpToTab('Data Stream Selection')" title="Go to sheet">↗ Open</span></div>
-        <button class="action-btn" onclick="runFunc('writeDataStreamSelectionToSheet', 'Data Stream Selection')">List Data Stream Selection</button>
-        
-        <div class="group-title">Account Change History <span class="jump-link" onclick="jumpToTab('Account Change History')" title="Go to sheet">↗ Open</span></div>
-        <button class="action-btn" onclick="runFunc('listAccountHistory', 'Account Change History')">List Account Change History</button>
-        
+
+      <div class="group-title">Property Details <span class="jump-link" onclick="jumpToTab('Property Details')"
+          title="Go to sheet">↗ Open</span></div>
+      <div class="inline-btns">
+        <button class="action-btn" onclick="runFunc('writeGA4PropertyDetailsToSheet', 'Property Details')">List</button>
+        <button class="action-btn" onclick="runFunc('modifyGA4Properties', 'Property Details')">Modify</button>
+      </div>
+
         <div class="group-title">Global Settings</div>
         <button class="action-btn" onclick="runFunc('listAllGA4PropertyResources')">List All Property Settings</button>
         <button class="action-btn" onclick="runFunc('checkRelease')">Check for Updates</button>
@@ -146,33 +147,50 @@
     </details>
 
     <details>
-      <summary>Core Entities</summary>
+      <summary>Data Streams & Event Rules</summary>
       <div class="group">
-        <div class="group-title">Properties <span class="jump-link" onclick="jumpToTab('Property Details')" title="Go to sheet">↗ Open</span></div>
+        <div class="group-title">Data Streams <span class="jump-link" onclick="jumpToTab('Data Streams')"
+            title="Go to sheet">↗ Open</span></div>
         <div class="inline-btns">
-          <button class="action-btn" onclick="runFunc('writeGA4PropertyDetailsToSheet', 'Property Details')">List</button>
-          <button class="action-btn" onclick="runFunc('modifyGA4Properties', 'Property Details')">Modify</button>
+          <button class="action-btn" onclick="runFunc('writeGA4StreamsToSheet', 'Data Streams')">List</button>
+          <button class="action-btn" onclick="runFunc('modifyGA4Streams', 'Data Streams')">Modify</button>
         </div>
-        <div class="group-title">Users <span class="jump-link" onclick="jumpToTab('Users')" title="Go to sheet">↗ Open</span></div>
+        
+        <div class="group-title">Data Stream Selection <span class="jump-link" onclick="jumpToTab('Data Stream Selection')" title="Go to sheet">↗ Open</span></div>
+        <button class="action-btn" onclick="runFunc('writeDataStreamSelectionToSheet', 'Data Stream Selection')">Data Stream Selection (Selector)</button>
+        <div class="group-title">Measurement Protocol Secrets <span class="jump-link"
+            onclick="jumpToTab('Measurement Protocol Secrets')" title="Go to sheet">↗ Open</span></div>
         <div class="inline-btns">
-          <button class="action-btn" onclick="runFunc('writeGA4AccessBindingsToSheet', 'Users')">List</button>
-          <button class="action-btn" onclick="runFunc('modifyGA4AccessBindings', 'Users')">Modify</button>
+          <button class="action-btn"
+            onclick="runFunc('writeGA4MeasurementProtocolSecretsToSheet', 'Measurement Protocol Secrets')">List</button>
+          <button class="action-btn"
+            onclick="runFunc('modifyMeasurementProtocolSecrets', 'Measurement Protocol Secrets')">Modify</button>
         </div>
-        <div class="group-title">Audiences <span class="jump-link" onclick="jumpToTab('Audiences')" title="Go to sheet">↗ Open</span></div>
+        <div class="group-title">sKAd Conversion Schemas <span class="jump-link"
+            onclick="jumpToTab('sKAd Conversion Schemas')" title="Go to sheet">↗ Open</span></div>
         <div class="inline-btns">
-          <button class="action-btn" onclick="runFunc('writeGA4AudiencesToSheet', 'Audiences')">List</button>
-          <button class="action-btn" onclick="runFunc('modifyGA4Audiences', 'Audiences')">Modify</button>
+          <button class="action-btn"
+            onclick="runFunc('writeSKAdConversionSchemasToSheet', 'sKAd Conversion Schemas')">List</button>
+          <button class="action-btn"
+            onclick="runFunc('modifySKAdConversionSchemas', 'sKAd Conversion Schemas')">Modify</button>
         </div>
-        <div class="group-title">Channel Groups <span class="jump-link" onclick="jumpToTab('Channel Groups')" title="Go to sheet">↗ Open</span></div>
+        <div class="group-title">Event Create Rules <span class="jump-link" onclick="jumpToTab('Event Create Rules')"
+            title="Go to sheet">↗ Open</span></div>
         <div class="inline-btns">
-          <button class="action-btn" onclick="runFunc('writeGA4ChannelGroupsToSheet', 'Channel Groups')">List</button>
-          <button class="action-btn" onclick="runFunc('modifyChannelGroups', 'Channel Groups')">Modify</button>
+          <button class="action-btn" onclick="runFunc('writeGA4EventCreateRulesToSheet', 'Event Create Rules')">List</button>
+          <button class="action-btn" onclick="runFunc('modifyEventCreateRules', 'Event Create Rules')">Modify</button>
+        </div>
+        <div class="group-title">Event Edit Rules <span class="jump-link" onclick="jumpToTab('Event Edit Rules')"
+            title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn" onclick="runFunc('writeEventEditRulesToSheet', 'Event Edit Rules')">List</button>
+          <button class="action-btn" onclick="runFunc('modifyEventEditRules', 'Event Edit Rules')">Modify</button>
         </div>
       </div>
     </details>
 
     <details>
-      <summary>Dimensions, Metrics & Events</summary>
+      <summary>Custom definitions & Key Events</summary>
       <div class="group">
         <div class="group-title">Custom Dimensions <span class="jump-link" onclick="jumpToTab('Custom Dimensions')" title="Go to sheet">↗ Open</span></div>
         <div class="inline-btns">
@@ -194,6 +212,38 @@
           <button class="action-btn" onclick="runFunc('writeGA4KeyEventsToSheet', 'Key Events')">List</button>
           <button class="action-btn" onclick="runFunc('modifyGA4KeyEvents', 'Key Events')">Modify</button>
         </div>
+      </div>
+    </details>
+      
+    <details>
+      <summary>Audiences</summary>
+      <div class="group">
+        <div class="group-title">Audience Definitions <span class="jump-link" onclick="jumpToTab('Audiences')"
+            title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn" onclick="runFunc('writeGA4AudiencesToSheet', 'Audiences')">List</button>
+          <button class="action-btn" onclick="runFunc('modifyGA4Audiences', 'Audiences')">Modify</button>
+        </div>
+        <div class="group-title">Audience User Exports <span class="jump-link" onclick="jumpToTab('Audience Lists')"
+            title="Go to sheet">↗ Open</span></div>
+        <button class="action-btn" onclick="runFunc('writeGA4AudiencesToAudiencesListsSheet', 'Audience Lists')">List Existing
+          Audiences</button>
+        <button class="action-btn" onclick="runFunc('writeAudienceListsToSheet', 'Audience Lists')">List Export Tasks</button>
+        <button class="action-btn" onclick="runFunc('createAudienceLists', 'Audience Lists')">Create Export Task</button>
+        <button class="action-btn" onclick="runFunc('checkAudienceListsState', 'Audience Lists')">Check Export States</button>
+        <button class="action-btn" onclick="runFunc('exportAudienceListsData', 'Audience Lists')">Download Exported
+          Users</button>
+      </div>
+    </details>
+
+    <details>
+      <summary>Users & Annotations</summary>
+      <div class="group">
+        <div class="group-title">Users <span class="jump-link" onclick="jumpToTab('Users')" title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn" onclick="runFunc('writeGA4AccessBindingsToSheet', 'Users')">List</button>
+          <button class="action-btn" onclick="runFunc('modifyGA4AccessBindings', 'Users')">Modify</button>
+        </div>
         <div class="group-title">Annotations <span class="jump-link" onclick="jumpToTab('Annotations')" title="Go to sheet">↗ Open</span></div>
         <div class="inline-btns">
           <button class="action-btn" onclick="runFunc('writeGA4AnnotationsToSheet', 'Annotations')">List</button>
@@ -203,12 +253,24 @@
     </details>
 
     <details>
-      <summary>Links & Integrations</summary>
+      <summary>Product Links</summary>
       <div class="group">
         <div class="group-title">Google Ads Links <span class="jump-link" onclick="jumpToTab('Google Ads Links')" title="Go to sheet">↗ Open</span></div>
         <div class="inline-btns">
           <button class="action-btn" onclick="runFunc('writeGA4AdsLinksToSheet', 'Google Ads Links')">List</button>
           <button class="action-btn" onclick="runFunc('modifyGA4AdsLinks', 'Google Ads Links')">Modify</button>
+        </div>
+        <div class="group-title">AdSense Links <span class="jump-link" onclick="jumpToTab('AdSense Links')"
+            title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn" onclick="runFunc('writeGA4AdSenseLinksToSheet', 'AdSense Links')">List</button>
+          <button class="action-btn" onclick="runFunc('modifyAdSenseLinks', 'AdSense Links')">Modify</button>
+        </div>
+        <div class="group-title">BigQuery Links <span class="jump-link" onclick="jumpToTab('BigQuery Links')"
+            title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn" onclick="runFunc('writeGA4BigQueryLinksToSheet', 'BigQuery Links')">List</button>
+          <button class="action-btn" onclick="runFunc('modifyBigQueryLinksToSheet', 'BigQuery Links')">Modify</button>
         </div>
         <div class="group-title">Firebase Links <span class="jump-link" onclick="jumpToTab('Firebase Links')" title="Go to sheet">↗ Open</span></div>
         <div class="inline-btns">
@@ -225,91 +287,56 @@
           <button class="action-btn" onclick="runFunc('writeGA4SA360LinksToSheet', 'SA360 Links')">List</button>
           <button class="action-btn" onclick="runFunc('modifyGA4SA360Links', 'SA360 Links')">Modify</button>
         </div>
-        <div class="group-title">BigQuery Links <span class="jump-link" onclick="jumpToTab('BigQuery Links')" title="Go to sheet">↗ Open</span></div>
-        <div class="inline-btns">
-          <button class="action-btn" onclick="runFunc('writeGA4BigQueryLinksToSheet', 'BigQuery Links')">List</button>
-          <button class="action-btn" onclick="runFunc('modifyBigQueryLinksToSheet', 'BigQuery Links')">Modify</button>
-        </div>
-        <div class="group-title">AdSense Links <span class="jump-link" onclick="jumpToTab('AdSense Links')" title="Go to sheet">↗ Open</span></div>
-        <div class="inline-btns">
-          <button class="action-btn" onclick="runFunc('writeGA4AdSenseLinksToSheet', 'AdSense Links')">List</button>
-          <button class="action-btn" onclick="runFunc('modifyAdSenseLinks', 'AdSense Links')">Modify</button>
-        </div>
-      </div>
-    </details>
-
-    <details>
-      <summary>Streams, Rules & Filters</summary>
-      <div class="group">
-        <div class="group-title">Data Streams <span class="jump-link" onclick="jumpToTab('Data Streams')" title="Go to sheet">↗ Open</span></div>
-        <div class="inline-btns">
-          <button class="action-btn" onclick="runFunc('writeGA4StreamsToSheet', 'Data Streams')">List</button>
-          <button class="action-btn" onclick="runFunc('modifyGA4Streams', 'Data Streams')">Modify</button>
-        </div>
-        <div class="group-title">sKAd Conversion Schemas <span class="jump-link" onclick="jumpToTab('sKAd Conversion Schemas')" title="Go to sheet">↗ Open</span></div>
-        <div class="inline-btns">
-          <button class="action-btn" onclick="runFunc('writeSKAdConversionSchemasToSheet', 'sKAd Conversion Schemas')">List</button>
-          <button class="action-btn" onclick="runFunc('modifySKAdConversionSchemas', 'sKAd Conversion Schemas')">Modify</button>
-        </div>
-        <div class="group-title">Measurement Protocol Secrets <span class="jump-link" onclick="jumpToTab('Measurement Protocol Secrets')" title="Go to sheet">↗ Open</span></div>
-        <div class="inline-btns">
-          <button class="action-btn" onclick="runFunc('writeGA4MeasurementProtocolSecretsToSheet', 'Measurement Protocol Secrets')">List</button>
-          <button class="action-btn" onclick="runFunc('modifyMeasurementProtocolSecrets', 'Measurement Protocol Secrets')">Modify</button>
-        </div>
-        <div class="group-title">Event Create Rules <span class="jump-link" onclick="jumpToTab('Event Create Rules')" title="Go to sheet">↗ Open</span></div>
-        <div class="inline-btns">
-          <button class="action-btn" onclick="runFunc('writeGA4EventCreateRulesToSheet', 'Event Create Rules')">List</button>
-          <button class="action-btn" onclick="runFunc('modifyEventCreateRules', 'Event Create Rules')">Modify</button>
-        </div>
-        <div class="group-title">Event Edit Rules <span class="jump-link" onclick="jumpToTab('Event Edit Rules')" title="Go to sheet">↗ Open</span></div>
-        <div class="inline-btns">
-          <button class="action-btn" onclick="runFunc('writeEventEditRulesToSheet', 'Event Edit Rules')">List</button>
-          <button class="action-btn" onclick="runFunc('modifyEventEditRules', 'Event Edit Rules')">Modify</button>
-        </div>
-      </div>
-    </details>
-
-    <details>
-      <summary>Advanced Tasks</summary>
-      <div class="group">
-        <div class="group-title">Easy Property Creation <span class="jump-link" onclick="jumpToTab('Easy Property Creation')" title="Go to sheet">↗ Open</span></div>
-        <button class="action-btn" onclick="runFunc('writePropertyTemplatesToSheet', 'Easy Property Creation')">List Templates</button>
-        <button class="action-btn" onclick="runFunc('createPropertiesFromTemplates', 'Easy Property Creation')">Create Properties</button>
-        <button class="action-btn" onclick="runFunc('resizeEasyPropertyCreationSheetRowHeights', 'Easy Property Creation')">Resize Row Heights</button>
-        
-        <div class="group-title">Health Report <span class="jump-link" onclick="jumpToTab('Report Settings')" title="Go to sheet">↗ Open</span></div>
-        <button class="action-btn" onclick="runFunc('createHealthReport', 'Report Settings')">Create Report</button>
-        
-        <div class="group-title">Audience Lists <span class="jump-link" onclick="jumpToTab('Audience Lists')" title="Go to sheet">↗ Open</span></div>
-        <button class="action-btn" onclick="runFunc('writeGA4AudiencesToAudiencesListsSheet', 'Audience Lists')">List Existing Audiences</button>
-        <button class="action-btn" onclick="runFunc('writeAudienceListsToSheet', 'Audience Lists')">List Audience Lists</button>
-        <button class="action-btn" onclick="runFunc('createAudienceLists', 'Audience Lists')">Create Audience Lists</button>
-        <button class="action-btn" onclick="runFunc('checkAudienceListsState', 'Audience Lists')">Check Audience List States</button>
-        <button class="action-btn" onclick="runFunc('exportAudienceListsData', 'Audience Lists')">Export Audience Lists</button>
-        
-        <div class="group-title">User Access Report <span class="jump-link" onclick="jumpToTab('User Access Report')" title="Go to sheet">↗ Open</span></div>
-        <button class="action-btn" onclick="runFunc('writeUserAccessReportDataToSheet', 'User Access Report')">Run Report</button>
       </div>
     </details>
 
     <details>
       <summary>GA360 Features</summary>
       <div class="group">
-        <div class="group-title">Expanded Data Sets <span class="jump-link" onclick="jumpToTab('Expanded Data Sets')" title="Go to sheet">↗ Open</span></div>
+        <div class="group-title">Subproperty Event Filters <span class="jump-link"
+            onclick="jumpToTab('Subproperty Event Filters')" title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn"
+            onclick="runFunc('writeGA4SubpropertyEventFiltersToSheet', 'Subproperty Event Filters')">List</button>
+          <button class="action-btn"
+            onclick="runFunc('modifySubpropertyEventFilters', 'Subproperty Event Filters')">Modify</button>
+        </div>
+        <div class="group-title">Rollup Property Source Links <span class="jump-link"
+            onclick="jumpToTab('Rollup Property Source Links')" title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn"
+            onclick="runFunc('writeGA4RollupPropertySourceLinksToSheet', 'Rollup Property Source Links')">List</button>
+          <button class="action-btn"
+            onclick="runFunc('modifyRollupPropertySourceLinks', 'Rollup Property Source Links')">Modify</button>
+        </div>
+        <div class="group-title">Expanded Data Sets <span class="jump-link" onclick="jumpToTab('Expanded Data Sets')"
+            title="Go to sheet">↗ Open</span></div>
         <div class="inline-btns">
           <button class="action-btn" onclick="runFunc('writeGA4ExpandedDataSetsToSheet', 'Expanded Data Sets')">List</button>
           <button class="action-btn" onclick="runFunc('modifyGA4ExpandedDataSets', 'Expanded Data Sets')">Modify</button>
         </div>
-        <div class="group-title">Subproperty Event Filters <span class="jump-link" onclick="jumpToTab('Subproperty Event Filters')" title="Go to sheet">↗ Open</span></div>
-        <div class="inline-btns">
-          <button class="action-btn" onclick="runFunc('writeGA4SubpropertyEventFiltersToSheet', 'Subproperty Event Filters')">List</button>
-          <button class="action-btn" onclick="runFunc('modifySubpropertyEventFilters', 'Subproperty Event Filters')">Modify</button>
-        </div>
-        <div class="group-title">Rollup Property Source Links <span class="jump-link" onclick="jumpToTab('Rollup Property Source Links')" title="Go to sheet">↗ Open</span></div>
-        <div class="inline-btns">
-          <button class="action-btn" onclick="runFunc('writeGA4RollupPropertySourceLinksToSheet', 'Rollup Property Source Links')">List</button>
-          <button class="action-btn" onclick="runFunc('modifyRollupPropertySourceLinks', 'Rollup Property Source Links')">Modify</button>
-        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary>Tools & Utilities</summary>
+      <div class="group">
+        <div class="group-title">Easy Property Creation <span class="jump-link" onclick="jumpToTab('Easy Property Creation')" title="Go to sheet">↗ Open</span></div>
+        <button class="action-btn" onclick="runFunc('writePropertyTemplatesToSheet', 'Easy Property Creation')">List Templates</button>
+        <button class="action-btn" onclick="runFunc('createPropertiesFromTemplates', 'Easy Property Creation')">Create Properties</button>
+        <button class="action-btn" onclick="runFunc('resizeEasyPropertyCreationSheetRowHeights', 'Easy Property Creation')">Resize Row Heights</button>
+        
+        <div class="group-title">Health Report <span class="jump-link" onclick="jumpToTab('Report Settings')"
+            title="Go to sheet">↗ Open</span></div>
+        <button class="action-btn" onclick="runFunc('createHealthReport', 'Report Settings')">Create Report</button>
+
+        <div class="group-title">Account Change History <span class="jump-link" onclick="jumpToTab('Account Change History')"
+            title="Go to sheet">↗ Open</span></div>
+        <button class="action-btn" onclick="runFunc('listAccountHistory', 'Account Change History')">List Account Change
+          History</button>
+
+        <div class="group-title">User Access Report <span class="jump-link" onclick="jumpToTab('User Access Report')" title="Go to sheet">↗ Open</span></div>
+        <button class="action-btn" onclick="runFunc('writeUserAccessReportDataToSheet', 'User Access Report')">Run Report</button>
       </div>
     </details>
 
