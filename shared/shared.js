@@ -159,7 +159,9 @@ function writeToSheet(data, sheetName) {
     sheet.getRange(ranges.row, ranges.column, data.length, ranges.numColumns)
          .setValues(data);
   }
-  sheet.activate();
+  if (getAutoJump()) {
+    sheet.activate();
+  }
 }
 /**
  * Retrieves data from a specified sheet.

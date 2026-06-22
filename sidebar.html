@@ -121,6 +121,18 @@
         color: #1a73e8;
         border-color: #d2e3fc;
       }
+      .setting-item {
+        margin: 8px 0;
+        display: flex;
+        align-items: center;
+      }
+      .setting-item label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        user-select: none;
+      }
     </style>
   </head>
   <body>
@@ -142,7 +154,6 @@
 
         <div class="group-title">Global Settings</div>
         <button class="action-btn" onclick="runFunc('listAllGA4PropertyResources')">List All Property Settings</button>
-        <button class="action-btn" onclick="runFunc('checkRelease')">Check for Updates</button>
       </div>
     </details>
 
@@ -339,11 +350,34 @@
       </div>
     </details>
 
+    <details>
+      <summary>Settings</summary>
+      <div class="group">
+        <div class="setting-item">
+          <label>
+            <input type="checkbox" id="toggle-full-menu" onchange="toggleFullMenu(this.checked)">
+            Enable Full Spreadsheet Menu
+          </label>
+        </div>
+        <div class="setting-item">
+          <label>
+            <input type="checkbox" id="toggle-auto-jump" onchange="toggleAutoJump(this.checked)">
+            Auto-Jump to Tab on Run
+          </label>
+        </div>
+        <div class="group-title">System</div>
+        <button class="action-btn" onclick="runFunc('checkRelease')">Check for Updates</button>
+      </div>
+    </details>
+
     <script>
       function runFunc(funcName, sheetName) {
         if (sheetName) {
-          // Passing true explicitly prevents jumpToTab from altering the active processing UI state
-          jumpToTab(sheetName, true);
+          const autoJumpEnabled = document.getElementById('toggle-auto-jump').checked;
+          if (autoJumpEnabled) {
+            // Passing true explicitly prevents jumpToTab from altering the active processing UI state
+            jumpToTab(sheetName, true);
+          }
         }
 
         const statusEl = document.getElementById('status');
@@ -388,6 +422,30 @@
             }
           })
           .activateSheetByName(sheetName);
+      }
+
+      // Initialize settings on load
+      window.addEventListener('DOMContentLoaded', (event) => {
+        google.script.run
+          .withSuccessHandler(function(mode) {
+            document.getElementById('toggle-full-menu').checked = (mode === 'full');
+          })
+          .getMenuMode();
+          
+        google.script.run
+          .withSuccessHandler(function(enabled) {
+            document.getElementById('toggle-auto-jump').checked = enabled;
+          })
+          .getAutoJump();
+      });
+
+      function toggleFullMenu(checked) {
+        const mode = checked ? 'full' : 'simplified';
+        google.script.run.setMenuMode(mode);
+      }
+
+      function toggleAutoJump(checked) {
+        google.script.run.setAutoJump(checked);
       }
     </script>
   </body>

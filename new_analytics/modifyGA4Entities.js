@@ -192,7 +192,9 @@ function modifyGA4Annotations() {
  * the data will be retrieved.
  */
 function modifyGA4Entities(sheetName) {
-  SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName).activate();
+  if (getAutoJump()) {
+    SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName).activate();
+  }
   let entities = getDataFromSheet(sheetName);
   let ga4Resource = Object.keys(sheetsMeta.ga4).find(
     key => sheetsMeta.ga4[key].sheetName === sheetName);
