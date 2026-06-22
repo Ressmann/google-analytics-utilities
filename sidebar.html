@@ -223,6 +223,7 @@
         padding: 6px 0;
         font-size: 12px;
         color: var(--text-primary);
+        position: relative; /* Tooltip anchor */
       }
       .switch {
         position: relative;
@@ -631,7 +632,9 @@
           "User Access Report": "Run user access reports. Requires GA360 properties.",
           "Easy Property Creation": "Process: 1. Click 'List Templates' to set up sheet. 2. Fill in template rows. 3. Click 'Create Properties' to bulk create.",
           "Health Report": "Generate a configuration health report. Requires you to select properties/streams first.",
-          "Account Change History": "List administrative change history for selected GA4 accounts."
+          "Account Change History": "List administrative change history for selected GA4 accounts.",
+          "Enable Full Spreadsheet Menu": "Show all configuration sheets and options in the spreadsheet's top menu. If disabled, only shows 'Show Sidebar'.",
+          "Auto-Jump to Tab on Run": "Automatically activate and switch to the corresponding sheet tab when running a tool."
         };
 
         // Inject tooltips into group titles
@@ -670,6 +673,23 @@
             }
           } catch (err) {
             console.error('Error injecting tooltip for: ' + titleEl.innerText, err);
+          }
+        });
+
+        // Inject tooltips into setting item labels
+        const settingSpans = document.querySelectorAll('.setting-item > span');
+        settingSpans.forEach(spanEl => {
+          try {
+            const name = spanEl.textContent.trim();
+            if (tooltips[name]) {
+              const infoIcon = document.createElement('span');
+              infoIcon.className = 'info-icon';
+              infoIcon.setAttribute('data-tooltip', tooltips[name]);
+              infoIcon.textContent = 'ⓘ';
+              spanEl.appendChild(infoIcon);
+            }
+          } catch (err) {
+            console.error('Error injecting tooltip for setting: ' + spanEl.innerText, err);
           }
         });
 
