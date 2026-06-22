@@ -102,7 +102,6 @@
         border: 1px solid var(--border-color);
         border-radius: 6px;
         background-color: var(--bg-color);
-        overflow: hidden;
         transition: box-shadow 0.2s ease, border-color 0.2s ease;
       }
       details[open] {
@@ -119,6 +118,10 @@
         align-items: center;
         justify-content: space-between;
         user-select: none;
+        border-radius: 5px;
+      }
+      details[open] summary {
+        border-radius: 5px 5px 0 0;
       }
       summary:hover {
         background-color: #f1f3f4;
@@ -150,6 +153,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
+        position: relative; /* Tooltip anchor */
       }
       .group-title:first-child {
         margin-top: 4px;
@@ -255,6 +259,45 @@
       }
       input:checked + .slider:before {
         transform: translateX(16px);
+      }
+      
+      /* Info Icon Tooltips */
+      .info-icon {
+        cursor: help;
+        font-size: 10px;
+        margin-left: 4px;
+        color: var(--text-secondary);
+        display: inline-block;
+        text-transform: none; /* Prevent uppercase from group-title */
+      }
+      .info-icon:hover {
+        color: var(--primary-color);
+      }
+      .info-icon::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        top: 20px;
+        left: 0;
+        right: 0;
+        background-color: #3c4043;
+        color: #fff;
+        padding: 6px 10px;
+        border-radius: 4px;
+        font-size: 11px;
+        z-index: 1010;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease, visibility 0.2s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        font-weight: normal;
+        text-transform: none;
+        letter-spacing: normal;
+        line-height: 1.4;
+        white-space: normal;
+      }
+      .info-icon:hover::after {
+        opacity: 1;
+        visibility: visible;
       }
     </style>
   </head>
@@ -557,6 +600,80 @@
 
       // Initialize settings on load
       window.addEventListener('DOMContentLoaded', (event) => {
+        // Tooltip definitions for groups
+        const tooltips = {
+          "Account Summaries": "List GA4 Account Summaries (Accounts, Properties, and Streams). Run this first to see your GA4 structure.",
+          "Property Details": "List or modify GA4 properties. To modify: 1. Run 'List' to populate. 2. Edit properties in the sheet. 3. Check 'Update'/'Remove' on rows. 4. Click 'Modify'.",
+          "Global Settings": "Will run through all actions and populate all Sheet tabs. List all settings for all properties in the selected accounts. Useful for a quick audit.",
+          "Data Streams": "List or modify GA4 data streams. To modify: 1. Run 'List'. 2. Make changes in sheet. 3. Check 'Update'/'Remove'. 4. Click 'Modify'.",
+          "Data Stream Selection": "List and select specific data streams. This selection filters which streams are processed by other tools (like Measurement Protocol Secrets).",
+          "Measurement Protocol Secrets": "List or modify Measurement Protocol API secrets. REQUIRES you to select streams in the 'Data Stream Selection' sheet first.",
+          "sKAd Conversion Schemas": "List or modify SKAdNetwork conversion value schemas. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Update'/'Remove'. 4. Click 'Modify'.",
+          "Event Create Rules": "List or modify event creation rules. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Update'/'Remove'. 4. Click 'Modify'.",
+          "Event Edit Rules": "List or modify event edit rules. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Update'/'Remove'. 4. Click 'Modify'.",
+          "Custom Dimensions": "List or modify custom dimensions. To modify: 1. Run 'List'. 2. Edit sheet (check 'Create'/'Update'/'Remove'). 3. Click 'Modify'.",
+          "Custom Metrics": "List or modify custom metrics. To modify: 1. Run 'List'. 2. Edit sheet (check 'Create'/'Update'/'Remove'). 3. Click 'Modify'.",
+          "Calculated Metrics": "List or modify calculated metrics. To modify: 1. Run 'List'. 2. Edit sheet (check 'Create'/'Update'/'Remove'). 3. Click 'Modify'.",
+          "Key Events": "List or modify key events (conversions). To modify: 1. Run 'List'. 2. Edit sheet (check 'Create'/'Remove'). 3. Click 'Modify'.",
+          "Audience Definitions": "List or modify GA4 audience definitions. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Create'/'Remove'. 4. Click 'Modify'.",
+          "Audience User Exports": "Process: 1. List audiences to get IDs. 2. Select audiences in sheet. 3. Click 'Create Audience Lists'. 4. Click 'Check States' until ready. 5. Click 'Export Data' to download.",
+          "Users": "List or modify user access permissions. To modify: 1. Run 'List'. 2. Edit roles. 3. Check 'Create'/'Update'/'Remove'. 4. Click 'Modify'.",
+          "Annotations": "List or modify property annotations. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Create'/'Update'/'Remove'. 4. Click 'Modify'.",
+          "Google Ads Links": "List or modify Google Ads integrations. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Create'/'Remove'. 4. Click 'Modify'.",
+          "AdSense Links": "List or modify AdSense integrations. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Create'/'Remove'. 4. Click 'Modify'.",
+          "BigQuery Links": "List or modify BigQuery integrations. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Create'/'Remove' (Note: BigQuery delete must be done in BigQuery console). 4. Click 'Modify'.",
+          "Firebase Links": "List or modify Firebase integrations. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Create'/'Remove'. 4. Click 'Modify'.",
+          "DV360 Links": "List or modify DV360 integrations. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Create'/'Update'/'Remove'. 4. Click 'Modify'.",
+          "SA360 Links": "List or modify SA360 integrations. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Create'/'Update'/'Remove'. 4. Click 'Modify'.",
+          "Subproperty Event Filters": "List or modify event filters for subproperties. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Create'/'Update'/'Remove'. 4. Click 'Modify'.",
+          "Rollup Property Source Links": "List or modify source links for rollup properties. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Create'/'Remove'. 4. Click 'Modify'.",
+          "Expanded Data Sets": "List or modify expanded data sets. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Create'/'Remove'. 4. Click 'Modify'.",
+          "User Access Report": "Run user access reports. Requires GA360 properties.",
+          "Easy Property Creation": "Process: 1. Click 'List Templates' to set up sheet. 2. Fill in template rows. 3. Click 'Create Properties' to bulk create.",
+          "Health Report": "Generate a configuration health report. Requires you to select properties/streams first.",
+          "Account Change History": "List administrative change history for selected GA4 accounts."
+        };
+
+        // Inject tooltips into group titles
+        const groupTitles = document.querySelectorAll('.group-title');
+        groupTitles.forEach(titleEl => {
+          try {
+            const jumpLink = titleEl.querySelector('.jump-link');
+            let name = '';
+            if (jumpLink) {
+              const clone = titleEl.cloneNode(true);
+              const cloneJumpLink = clone.querySelector('.jump-link');
+              if (cloneJumpLink) {
+                cloneJumpLink.remove();
+              }
+              name = clone.textContent.trim();
+            } else {
+              name = titleEl.textContent.trim();
+            }
+            
+            if (tooltips[name]) {
+              const textSpan = document.createElement('span');
+              textSpan.textContent = name + ' ';
+              
+              const infoIcon = document.createElement('span');
+              infoIcon.className = 'info-icon';
+              infoIcon.setAttribute('data-tooltip', tooltips[name]);
+              infoIcon.textContent = 'ⓘ';
+              
+              textSpan.appendChild(infoIcon);
+              
+              titleEl.innerHTML = '';
+              titleEl.appendChild(textSpan);
+              if (jumpLink) {
+                titleEl.appendChild(jumpLink);
+              }
+            }
+          } catch (err) {
+            console.error('Error injecting tooltip for: ' + titleEl.innerText, err);
+          }
+        });
+
+        // Initialize settings
         google.script.run
           .withSuccessHandler(function(mode) {
             document.getElementById('toggle-full-menu').checked = (mode === 'full');
