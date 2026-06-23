@@ -89,10 +89,10 @@ function listAllFeatureSettings(properties) {
           listGA4Entities(
             'customMetrics', 
             propertyResourceName).customMetrics), null, 2) || '[]',
-        JSON.stringify(cleanOutput('conversionEvents',
+        JSON.stringify(cleanOutput('keyEvents',
           listGA4Entities(
-            'conversionEvents', 
-            propertyResourceName).conversionEvents), null, 2) || '[]',
+            'keyEvents', 
+            propertyResourceName).keyEvents), null, 2) || '[]',
         JSON.stringify(cleanOutput('googleAdsLinks',
           listGA4Entities(
             'googleAdsLinks', 
@@ -113,7 +113,7 @@ function listAllFeatureSettings(properties) {
         JSON.stringify(cleanOutput('adSenseLinks',
           listGA4Entities(
             'adSenseLinks', 
-            propertyResourceName).firebaseLinks), null, 2) || '[]',
+            propertyResourceName).adSenseLinks), null, 2) || '[]',
         JSON.stringify(cleanOutput('channelGroups',
           listGA4Entities(
             'channelGroups', 
@@ -187,7 +187,7 @@ function cleanOutput(resourceType, value) {
       value.forEach(metric => {
         delete metric.name;
       });
-    } else if (resourceType == 'conversionEvents') {
+    } else if (resourceType == 'keyEvents') {
       const defaultConversions = [
         'app_store_subscription_convert',
         'app_store_subscription_renew',
@@ -254,7 +254,8 @@ function createPropertiesFromTemplates() {
     data.forEach((row, index) => {
       const create = row[row.length - 4];
       if (create) {
-        const parentAccount = 'accounts/' + row[4];
+        const targetAccountId = row[4] || row[1];
+        const parentAccount = 'accounts/' + targetAccountId;
 
         // Parse settings.
         const settings = {
@@ -265,7 +266,7 @@ function createPropertiesFromTemplates() {
           streams: JSON.parse(row[10] || '[]'),
           customDimensions: JSON.parse(row[11] || '[]'),
           customMetrics: JSON.parse(row[12] || '[]'),
-          conversionEvents: JSON.parse(row[13] || '[]'),
+          keyEvents: JSON.parse(row[13] || '[]'),
           googleAdsLinks: JSON.parse(row[14] || '[]'),
           displayVideo360AdvertiserLinks: JSON.parse(row[15] || '[]'),
           searchAds360Links: JSON.parse(row[16] || '[]'),
@@ -284,6 +285,9 @@ function createPropertiesFromTemplates() {
             newProperty = createGA4Entity(
               'properties', parentAccount, settings.property);
             responses.push(newProperty);
+            if (newProperty instanceof Error || !newProperty.name) {
+              break;
+            }
           } else if (setting == 'dataRetentionSettings') {
             // Set data retention settings.
             const response = updateGA4Entity(
@@ -369,13 +373,15 @@ function createPropertiesFromTemplates() {
         const sheet = SpreadsheetApp.getActive().getSheetByName(
           sheetsMeta.ga4.fullPropertyDeployment.sheetName
         );
-        // Set new property URL in the spreadsheet.
-        sheet.getRange(
-            index + 2, 
-            sheetsMeta.ga4.fullPropertyDeployment.read.numColumns - 4, 1, 1)
-          .setFormula(
-            '=HYPERLINK("https://analytics.google.com/analytics/web/#/p' + 
-            newProperty.name.split('/')[1] + '", "New Property")');
+        // Set new property URL in the spreadsheet if creation was successful.
+        if (newProperty && newProperty.name) {
+          sheet.getRange(
+              index + 2, 
+              sheetsMeta.ga4.fullPropertyDeployment.read.numColumns - 4, 1, 1)
+            .setFormula(
+              '=HYPERLINK("https://analytics.google.com/analytics/web/#/p' + 
+              newProperty.name.split('/')[1] + '", "New Property")');
+        }
         // Write the actions taken.
         writeActionTakenToSheet(
           sheetsMeta.ga4.fullPropertyDeployment.sheetName, index, 

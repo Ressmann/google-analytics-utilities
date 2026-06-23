@@ -49,6 +49,8 @@ function listAllGA4PropertyResources() {
     writeGA4EventCreateRulesToSheet();
     writeGA4RollupPropertySourceLinksToSheet();
     writeGA4SubpropertyEventFiltersToSheet();
+    writeGA4AnnotationsToSheet();
+
 }
 
 /**
@@ -157,6 +159,9 @@ function writeToSheet(data, sheetName) {
     sheet.getRange(ranges.row, ranges.column, data.length, ranges.numColumns)
          .setValues(data);
   }
+  if (getAutoJump()) {
+    sheet.activate();
+  }
 }
 /**
  * Retrieves data from a specified sheet.
@@ -167,9 +172,16 @@ function writeToSheet(data, sheetName) {
 function getDataFromSheet(sheetName) {
   const ranges = getSheetRange(sheetName, 'read');
   let sheet = ss.getSheetByName(sheetName);
+
+    console.log('getDataFromSheet: ', sheet.getRange(
+    ranges.row, ranges.column,
+    sheet.getLastRow() - ranges.row + 1, ranges.numColumns).getValues());
+
   return sheet.getRange(
     ranges.row, ranges.column,
     sheet.getLastRow() - ranges.row + 1, ranges.numColumns).getValues();
+
+
 }
 /**
  * Get selected properties from the account summaries sheet based
@@ -190,7 +202,7 @@ function getSelectedGa4Properties() {
  * @param {string} status The action taken for a given entity.
  */
 function writeActionTakenToSheet(sheetName, index, actionTaken) {
-	// The actual row to be written to is offset from the index value by 2, so
+	// The actual_row to be written to is offset from the index value by 2, so
 	// the index value must be increased by two.
 	const writeRow = index + 2;
   const actionTakenColumn = ss.getSheetByName(sheetName).getLastColumn();
@@ -206,11 +218,16 @@ function writeActionTakenToSheet(sheetName, index, actionTaken) {
  * @param {!Object} sheetsMetaField The object from the sheetsMeta variable.
  */
 function clearSheetContent(sheetsMetaField) {
-  const sheet = SpreadsheetApp.getActive().getSheetByName(
-    sheetsMetaField.sheetName);
-  sheet.getRange(
-    2, 1, sheet.getLastRow(), sheet.getLastColumn()
-  ).clearContent();
+  const sheet = SpreadsheetApp.getActive().getSheetByName(sheetsMetaField.sheetName);
+    // Use the configured write row if it exists, otherwise default to 2
+    const startRow = (sheetsMetaField.write && sheetsMetaField.write.row) ? sheetsMetaField.write.row : 2;
+    // Calculate how many rows to clear (ensure we don't clear before row 1)
+    const numRowsToClear = Math.max(0, sheet.getLastRow() - startRow + 1);
+    
+    if (numRowsToClear > 0) {
+      sheet.getRange(startRow, 1, numRowsToClear, sheet.getLastColumn())
+      .clearContent();
+      }
 }
 
 /**
@@ -308,4 +325,17 @@ function getSelectedGa4DataStreams() {
   const streams = getDataFromSheet(
     sheetsMeta.ga4.dataStreamSelection.sheetName);
   return streams.filter(row => row[4]);
+}
+
+/**
+ * Activates a sheet by its name.
+ * @param {string} sheetName The name of the sheet to activate.
+ */
+function activateSheetByName(sheetName) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+  if (sheet) {
+    sheet.activate();
+  } else {
+    throw new Error(`Sheet "${sheetName}" not found.`);
+  }
 }

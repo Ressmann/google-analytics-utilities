@@ -1,0 +1,761 @@
+<!-- //--New update -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+      :root {
+        --primary-color: #1a73e8;
+        --primary-hover: #1557b0;
+        --primary-bg: #e8f0fe;
+        --bg-color: #ffffff;
+        --surface-color: #f8f9fa;
+        --border-color: #dadce0;
+        --text-primary: #3c4043;
+        --text-secondary: #5f6368;
+        --success-color: #137333;
+        --success-bg: #e6f4ea;
+        --error-color: #c5221f;
+        --error-bg: #fce8e6;
+        --info-color: #1a73e8;
+        --info-bg: #e8f0fe;
+        --shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+      }
+
+      body {
+        font-family: 'Inter', sans-serif;
+        padding: 8px;
+        font-size: 13px;
+        color: var(--text-primary);
+        background-color: var(--bg-color);
+      }
+      
+      .sticky-header {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background-color: var(--bg-color);
+        padding-top: 4px;
+        padding-bottom: 6px;
+        margin-bottom: 8px;
+        border-bottom: 1px solid var(--border-color);
+      }
+      
+      #status {
+        margin-bottom: 6px;
+        padding: 6px 10px;
+        border-radius: 5px;
+        font-weight: 500;
+        text-align: center;
+        visibility: hidden;
+        min-height: 16px;
+        border: 1px solid transparent;
+        font-size: 11px;
+        box-shadow: 0 1px 2px 0 rgba(60,64,67,0.1);
+      }
+      
+      .info {
+        background-color: var(--info-bg);
+        color: var(--info-color);
+        border-color: #d2e3fc;
+      }
+      .processing {
+        background-color: #fef7e0;
+        color: #b06000;
+        border-color: #feefc3;
+      }
+      .success {
+        background-color: var(--success-bg);
+        color: var(--success-color);
+        border-color: #ceead6;
+      }
+      .error {
+        background-color: var(--error-bg);
+        color: var(--error-color);
+        border-color: #fad2cf;
+      }
+      
+      .search-container {
+        padding: 4px 0 0 0;
+      }
+      #search-input {
+        width: 100%;
+        padding: 6px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        font-size: 12px;
+        outline: none;
+        box-sizing: border-box;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        background-color: var(--surface-color);
+      }
+      #search-input:focus {
+        border-color: var(--primary-color);
+        background-color: var(--bg-color);
+        box-shadow: 0 0 0 2px rgba(26,115,232,0.15);
+      }
+      
+      details {
+        margin-bottom: 8px;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        background-color: var(--bg-color);
+        transition: box-shadow 0.2s ease, border-color 0.2s ease;
+      }
+      details[open] {
+        box-shadow: 0 2px 4px rgba(60,64,67,0.06);
+        border-color: #b3d1ff;
+      }
+      summary {
+        font-weight: 600;
+        cursor: pointer;
+        padding: 10px 12px;
+        background-color: var(--surface-color);
+        outline: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        user-select: none;
+        border-radius: 5px;
+      }
+      details[open] summary {
+        border-radius: 5px 5px 0 0;
+      }
+      summary:hover {
+        background-color: #f1f3f4;
+      }
+      summary::-webkit-details-marker {
+        display: none;
+      }
+      summary::after {
+        content: '▸';
+        font-size: 12px;
+        color: var(--text-secondary);
+        transition: transform 0.2s ease;
+      }
+      details[open] summary::after {
+        transform: rotate(90deg);
+      }
+      
+      .group {
+        padding: 8px 12px;
+        border-top: 1px solid #f1f3f4;
+      }
+      .group-title {
+        font-weight: 600;
+        margin: 8px 0 4px 0;
+        color: var(--text-secondary);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative; /* Tooltip anchor */
+      }
+      .group-title:first-child {
+        margin-top: 4px;
+      }
+      
+      .jump-link {
+        color: var(--primary-color);
+        cursor: pointer;
+        font-size: 10px;
+        text-decoration: none;
+        background-color: var(--primary-bg);
+        padding: 2px 8px;
+        border-radius: 10px;
+        text-transform: none;
+        font-weight: 600;
+        transition: background-color 0.2s ease;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .jump-link:hover {
+        background-color: #d2e3fc;
+      }
+      
+      .action-btn {
+        display: block;
+        width: 100%;
+        text-align: left;
+        background: none;
+        border: none;
+        padding: 6px 10px;
+        cursor: pointer;
+        color: var(--primary-color);
+        border-radius: 4px;
+        margin-bottom: 2px;
+        font-size: 12px;
+        font-weight: 500;
+        transition: background-color 0.2s ease, color 0.2s ease;
+      }
+      .action-btn:hover {
+        background-color: var(--primary-bg);
+      }
+      
+      .inline-btns {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 4px;
+      }
+      .inline-btns .action-btn {
+        text-align: center;
+        background-color: var(--surface-color);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        font-weight: 500;
+        padding: 6px;
+        border-radius: 4px;
+        margin-bottom: 0;
+      }
+      .inline-btns .action-btn:hover {
+        background-color: var(--primary-bg);
+        color: var(--primary-color);
+        border-color: #d2e3fc;
+      }
+      
+      /* Settings switch styles */
+      .setting-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 6px 0;
+        font-size: 12px;
+        color: var(--text-primary);
+        position: relative; /* Tooltip anchor */
+      }
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 36px;
+        height: 20px;
+      }
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: #dadce0;
+        transition: .3s;
+        border-radius: 20px;
+      }
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 14px;
+        width: 14px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .3s;
+        border-radius: 50%;
+      }
+      input:checked + .slider {
+        background-color: var(--primary-color);
+      }
+      input:checked + .slider:before {
+        transform: translateX(16px);
+      }
+      
+      /* Info Icon Tooltips */
+      .info-icon {
+        cursor: help;
+        font-size: 10px;
+        margin-left: 4px;
+        color: var(--text-secondary);
+        display: inline-block;
+        text-transform: none; /* Prevent uppercase from group-title */
+      }
+      .info-icon:hover {
+        color: var(--primary-color);
+      }
+      .info-icon::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        top: 20px;
+        left: 0;
+        right: 0;
+        background-color: #3c4043;
+        color: #fff;
+        padding: 6px 10px;
+        border-radius: 4px;
+        font-size: 11px;
+        z-index: 1010;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease, visibility 0.2s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        font-weight: normal;
+        text-transform: none;
+        letter-spacing: normal;
+        line-height: 1.4;
+        white-space: normal;
+      }
+      .info-icon:hover::after {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sticky-header">
+      <!-- Default state uses standard non-breaking space to hold dimensions if empty -->
+      <div id="status">&nbsp;</div>
+
+      <div class="search-container">
+        <input type="text" id="search-input" placeholder="Search tools..." oninput="filterTools(this.value)">
+      </div>
+    </div>
+
+    <details open>
+      <summary>Setup & Discovery</summary>
+      <div class="group">
+        <div class="group-title">Account Summaries <span class="jump-link" onclick="jumpToTab('Account Summaries')" title="Go to sheet">↗ Open</span></div>
+        <button class="action-btn" onclick="runFunc('writeGA4AccountSummariesToSheet', 'Account Summaries')">List Account Summaries</button>
+
+      <div class="group-title">Property Details <span class="jump-link" onclick="jumpToTab('Property Details')"
+          title="Go to sheet">↗ Open</span></div>
+      <div class="inline-btns">
+        <button class="action-btn" onclick="runFunc('writeGA4PropertyDetailsToSheet', 'Property Details')">List</button>
+        <button class="action-btn" onclick="runFunc('modifyGA4Properties', 'Property Details')">Modify</button>
+      </div>
+
+        <div class="group-title">Global Settings</div>
+        <button class="action-btn" onclick="runFunc('listAllGA4PropertyResources')">List All Property Settings</button>
+      </div>
+    </details>
+
+    <details>
+      <summary>Data Streams & Event Rules</summary>
+      <div class="group">
+        <div class="group-title">Data Streams <span class="jump-link" onclick="jumpToTab('Data Streams')"
+            title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn" onclick="runFunc('writeGA4StreamsToSheet', 'Data Streams')">List</button>
+          <button class="action-btn" onclick="runFunc('modifyGA4Streams', 'Data Streams')">Modify</button>
+        </div>
+        
+        <div class="group-title">Data Stream Selection <span class="jump-link" onclick="jumpToTab('Data Stream Selection')" title="Go to sheet">↗ Open</span></div>
+        <button class="action-btn" onclick="runFunc('writeDataStreamSelectionToSheet', 'Data Stream Selection')">Data Stream Selection (Selector)</button>
+        <div class="group-title">Measurement Protocol Secrets <span class="jump-link"
+            onclick="jumpToTab('Measurement Protocol Secrets')" title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn"
+            onclick="runFunc('writeGA4MeasurementProtocolSecretsToSheet', 'Measurement Protocol Secrets')">List</button>
+          <button class="action-btn"
+            onclick="runFunc('modifyMeasurementProtocolSecrets', 'Measurement Protocol Secrets')">Modify</button>
+        </div>
+        <div class="group-title">sKAd Conversion Schemas <span class="jump-link"
+            onclick="jumpToTab('sKAd Conversion Schemas')" title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn"
+            onclick="runFunc('writeSKAdConversionSchemasToSheet', 'sKAd Conversion Schemas')">List</button>
+          <button class="action-btn"
+            onclick="runFunc('modifySKAdConversionSchemas', 'sKAd Conversion Schemas')">Modify</button>
+        </div>
+        <div class="group-title">Event Create Rules <span class="jump-link" onclick="jumpToTab('Event Create Rules')"
+            title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn" onclick="runFunc('writeGA4EventCreateRulesToSheet', 'Event Create Rules')">List</button>
+          <button class="action-btn" onclick="runFunc('modifyEventCreateRules', 'Event Create Rules')">Modify</button>
+        </div>
+        <div class="group-title">Event Edit Rules <span class="jump-link" onclick="jumpToTab('Event Edit Rules')"
+            title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn" onclick="runFunc('writeEventEditRulesToSheet', 'Event Edit Rules')">List</button>
+          <button class="action-btn" onclick="runFunc('modifyEventEditRules', 'Event Edit Rules')">Modify</button>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary>Custom definitions & Key Events</summary>
+      <div class="group">
+        <div class="group-title">Custom Dimensions <span class="jump-link" onclick="jumpToTab('Custom Dimensions')" title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn" onclick="runFunc('writeGA4CustomDimensionsToSheet', 'Custom Dimensions')">List</button>
+          <button class="action-btn" onclick="runFunc('modifyGA4CustomDimensions', 'Custom Dimensions')">Modify</button>
+        </div>
+        <div class="group-title">Custom Metrics <span class="jump-link" onclick="jumpToTab('Custom Metrics')" title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn" onclick="runFunc('writeGA4CustomMetricsToSheet', 'Custom Metrics')">List</button>
+          <button class="action-btn" onclick="runFunc('modifyGA4CustomMetrics', 'Custom Metrics')">Modify</button>
+        </div>
+        <div class="group-title">Calculated Metrics <span class="jump-link" onclick="jumpToTab('Calculated Metrics')" title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn" onclick="runFunc('writeGA4CalculatedMetricsToSheet', 'Calculated Metrics')">List</button>
+          <button class="action-btn" onclick="runFunc('modifyCalculatedMetrics', 'Calculated Metrics')">Modify</button>
+        </div>
+        <div class="group-title">Key Events <span class="jump-link" onclick="jumpToTab('Key Events')" title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn" onclick="runFunc('writeGA4KeyEventsToSheet', 'Key Events')">List</button>
+          <button class="action-btn" onclick="runFunc('modifyGA4KeyEvents', 'Key Events')">Modify</button>
+        </div>
+      </div>
+    </details>
+      
+    <details>
+      <summary>Audiences</summary>
+      <div class="group">
+        <div class="group-title">Audience Definitions <span class="jump-link" onclick="jumpToTab('Audiences')"
+            title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn" onclick="runFunc('writeGA4AudiencesToSheet', 'Audiences')">List</button>
+          <button class="action-btn" onclick="runFunc('modifyGA4Audiences', 'Audiences')">Modify</button>
+        </div>
+        <div class="group-title">Audience User Exports <span class="jump-link" onclick="jumpToTab('Audience Lists')"
+            title="Go to sheet">↗ Open</span></div>
+        <button class="action-btn" onclick="runFunc('writeGA4AudiencesToAudiencesListsSheet', 'Audience Lists')">List Existing
+          Audiences</button>
+        <button class="action-btn" onclick="runFunc('writeAudienceListsToSheet', 'Audience Lists')">List Export Tasks</button>
+        <button class="action-btn" onclick="runFunc('createAudienceLists', 'Audience Lists')">Create Export Task</button>
+        <button class="action-btn" onclick="runFunc('checkAudienceListsState', 'Audience Lists')">Check Export States</button>
+        <button class="action-btn" onclick="runFunc('exportAudienceListsData', 'Audience Lists')">Download Exported
+          Users</button>
+      </div>
+    </details>
+
+    <details>
+      <summary>Users & Annotations</summary>
+      <div class="group">
+        <div class="group-title">Users <span class="jump-link" onclick="jumpToTab('Users')" title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn" onclick="runFunc('writeGA4AccessBindingsToSheet', 'Users')">List</button>
+          <button class="action-btn" onclick="runFunc('modifyGA4AccessBindings', 'Users')">Modify</button>
+        </div>
+        <div class="group-title">Annotations <span class="jump-link" onclick="jumpToTab('Annotations')" title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn" onclick="runFunc('writeGA4AnnotationsToSheet', 'Annotations')">List</button>
+          <button class="action-btn" onclick="runFunc('modifyGA4Annotations', 'Annotations')">Modify</button>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary>Product Links</summary>
+      <div class="group">
+        <div class="group-title">Google Ads Links <span class="jump-link" onclick="jumpToTab('Google Ads Links')" title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn" onclick="runFunc('writeGA4AdsLinksToSheet', 'Google Ads Links')">List</button>
+          <button class="action-btn" onclick="runFunc('modifyGA4AdsLinks', 'Google Ads Links')">Modify</button>
+        </div>
+        <div class="group-title">AdSense Links <span class="jump-link" onclick="jumpToTab('AdSense Links')"
+            title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn" onclick="runFunc('writeGA4AdSenseLinksToSheet', 'AdSense Links')">List</button>
+          <button class="action-btn" onclick="runFunc('modifyAdSenseLinks', 'AdSense Links')">Modify</button>
+        </div>
+        <div class="group-title">BigQuery Links <span class="jump-link" onclick="jumpToTab('BigQuery Links')"
+            title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn" onclick="runFunc('writeGA4BigQueryLinksToSheet', 'BigQuery Links')">List</button>
+          <button class="action-btn" onclick="runFunc('modifyBigQueryLinksToSheet', 'BigQuery Links')">Modify</button>
+        </div>
+        <div class="group-title">Firebase Links <span class="jump-link" onclick="jumpToTab('Firebase Links')" title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn" onclick="runFunc('writeGA4FirebaseLinksToSheet', 'Firebase Links')">List</button>
+          <button class="action-btn" onclick="runFunc('modifyGA4FirebaseLinks', 'Firebase Links')">Modify</button>
+        </div>
+        <div class="group-title">DV360 Links <span class="jump-link" onclick="jumpToTab('DV360 Links')" title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn" onclick="runFunc('writeGA4DV360LinksToSheet', 'DV360 Links')">List</button>
+          <button class="action-btn" onclick="runFunc('modifyGA4DV360Links', 'DV360 Links')">Modify</button>
+        </div>
+        <div class="group-title">SA360 Links <span class="jump-link" onclick="jumpToTab('SA360 Links')" title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn" onclick="runFunc('writeGA4SA360LinksToSheet', 'SA360 Links')">List</button>
+          <button class="action-btn" onclick="runFunc('modifyGA4SA360Links', 'SA360 Links')">Modify</button>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary>GA360 Features</summary>
+      <div class="group">
+        <div class="group-title">Subproperty Event Filters <span class="jump-link"
+            onclick="jumpToTab('Subproperty Event Filters')" title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn"
+            onclick="runFunc('writeGA4SubpropertyEventFiltersToSheet', 'Subproperty Event Filters')">List</button>
+          <button class="action-btn"
+            onclick="runFunc('modifySubpropertyEventFilters', 'Subproperty Event Filters')">Modify</button>
+        </div>
+        <div class="group-title">Rollup Property Source Links <span class="jump-link"
+            onclick="jumpToTab('Rollup Property Source Links')" title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn"
+            onclick="runFunc('writeGA4RollupPropertySourceLinksToSheet', 'Rollup Property Source Links')">List</button>
+          <button class="action-btn"
+            onclick="runFunc('modifyRollupPropertySourceLinks', 'Rollup Property Source Links')">Modify</button>
+        </div>
+        <div class="group-title">Expanded Data Sets <span class="jump-link" onclick="jumpToTab('Expanded Data Sets')"
+            title="Go to sheet">↗ Open</span></div>
+        <div class="inline-btns">
+          <button class="action-btn" onclick="runFunc('writeGA4ExpandedDataSetsToSheet', 'Expanded Data Sets')">List</button>
+          <button class="action-btn" onclick="runFunc('modifyGA4ExpandedDataSets', 'Expanded Data Sets')">Modify</button>
+        </div>
+        <div class="group-title">User Access Report <span class="jump-link" onclick="jumpToTab('User Access Report')" title="Go to sheet">↗ Open</span></div>
+        <button class="action-btn" onclick="runFunc('writeUserAccessReportDataToSheet', 'User Access Report')">Run Report</button>
+      </div>
+    </details>
+
+    <details>
+      <summary>Tools & Utilities</summary>
+      <div class="group">
+        <div class="group-title">Easy Property Creation <span class="jump-link" onclick="jumpToTab('Easy Property Creation')" title="Go to sheet">↗ Open</span></div>
+        <button class="action-btn" onclick="runFunc('writePropertyTemplatesToSheet', 'Easy Property Creation')">List Templates</button>
+        <button class="action-btn" onclick="runFunc('createPropertiesFromTemplates', 'Easy Property Creation')">Create Properties</button>
+        <button class="action-btn" onclick="runFunc('resizeEasyPropertyCreationSheetRowHeights', 'Easy Property Creation')">Resize Row Heights</button>
+        
+        <div class="group-title">Health Report <span class="jump-link" onclick="jumpToTab('Report Settings')"
+            title="Go to sheet">↗ Open</span></div>
+        <button class="action-btn" onclick="runFunc('createHealthReport', 'Report Settings')">Create Report</button>
+
+        <div class="group-title">Account Change History <span class="jump-link" onclick="jumpToTab('Account Change History')"
+            title="Go to sheet">↗ Open</span></div>
+        <button class="action-btn" onclick="runFunc('listAccountHistory', 'Account Change History')">List Account Change
+          History</button>
+      </div>
+    </details>
+
+    <details>
+      <summary>Settings</summary>
+      <div class="group">
+        <div class="setting-item">
+          <span>Enable Full Spreadsheet Menu</span>
+          <label class="switch">
+            <input type="checkbox" id="toggle-full-menu" onchange="toggleFullMenu(this.checked)">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="setting-item">
+          <span>Auto-Jump to Tab on Run</span>
+          <label class="switch">
+            <input type="checkbox" id="toggle-auto-jump" onchange="toggleAutoJump(this.checked)">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="group-title">System</div>
+        <button class="action-btn" onclick="runFunc('checkRelease')">Check for Updates</button>
+      </div>
+    </details>
+
+    <script>
+      function runFunc(funcName, sheetName) {
+        if (sheetName) {
+          const autoJumpEnabled = document.getElementById('toggle-auto-jump').checked;
+          if (autoJumpEnabled) {
+            // Passing true explicitly prevents jumpToTab from altering the active processing UI state
+            jumpToTab(sheetName, true);
+          }
+        }
+
+        const statusEl = document.getElementById('status');
+        statusEl.className = 'processing';
+        statusEl.style.visibility = 'visible';
+        statusEl.innerText = 'Processing...';
+        
+        google.script.run
+          .withSuccessHandler(function() {
+            statusEl.className = 'success';
+            statusEl.innerText = 'Task completed successfully!';
+            setTimeout(function() { statusEl.style.visibility = 'hidden'; }, 4000);
+          })
+          .withFailureHandler(function(err) {
+            statusEl.className = 'error';
+            statusEl.innerText = 'Error: ' + err.message;
+          })
+          [funcName]();
+      }
+
+      function jumpToTab(sheetName, silent) {
+        const statusEl = document.getElementById('status');
+        
+        if (!silent) {
+          statusEl.className = 'info';
+          statusEl.style.visibility = 'visible';
+          statusEl.innerText = 'Activating sheet...';
+        }
+        
+        google.script.run
+          .withSuccessHandler(function() {
+            if (!silent) {
+              statusEl.className = 'success';
+              statusEl.innerText = 'Sheet activated!';
+              setTimeout(function() { statusEl.style.visibility = 'hidden'; }, 2000);
+            }
+          })
+          .withFailureHandler(function(err) {
+            if (!silent) {
+              statusEl.className = 'error';
+              statusEl.innerText = 'Error: ' + err.message;
+            }
+          })
+          .activateSheetByName(sheetName);
+      }
+
+      // Initialize settings on load
+      window.addEventListener('DOMContentLoaded', (event) => {
+        // Tooltip definitions for groups
+        const tooltips = {
+          "Account Summaries": "List GA4 Account Summaries (Accounts, Properties, and Streams). Run this first to see your GA4 structure.",
+          "Property Details": "List or modify GA4 properties. To modify: 1. Run 'List' to populate. 2. Edit properties in the sheet. 3. Check 'Update'/'Remove' on rows. 4. Click 'Modify'.",
+          "Global Settings": "Will run through all actions and populate all Sheet tabs. List all settings for all properties in the selected accounts. Useful for a quick audit.",
+          "Data Streams": "List or modify GA4 data streams. To modify: 1. Run 'List'. 2. Make changes in sheet. 3. Check 'Update'/'Remove'. 4. Click 'Modify'.",
+          "Data Stream Selection": "List and select specific data streams. This selection filters which streams are processed by other tools (like Measurement Protocol Secrets).",
+          "Measurement Protocol Secrets": "List or modify Measurement Protocol API secrets. REQUIRES you to select streams in the 'Data Stream Selection' sheet first.",
+          "sKAd Conversion Schemas": "List or modify SKAdNetwork conversion value schemas. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Update'/'Remove'. 4. Click 'Modify'.",
+          "Event Create Rules": "List or modify event creation rules. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Update'/'Remove'. 4. Click 'Modify'.",
+          "Event Edit Rules": "List or modify event edit rules. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Update'/'Remove'. 4. Click 'Modify'.",
+          "Custom Dimensions": "List or modify custom dimensions. To modify: 1. Run 'List'. 2. Edit sheet (check 'Create'/'Update'/'Remove'). 3. Click 'Modify'.",
+          "Custom Metrics": "List or modify custom metrics. To modify: 1. Run 'List'. 2. Edit sheet (check 'Create'/'Update'/'Remove'). 3. Click 'Modify'.",
+          "Calculated Metrics": "List or modify calculated metrics. To modify: 1. Run 'List'. 2. Edit sheet (check 'Create'/'Update'/'Remove'). 3. Click 'Modify'.",
+          "Key Events": "List or modify key events (conversions). To modify: 1. Run 'List'. 2. Edit sheet (check 'Create'/'Remove'). 3. Click 'Modify'.",
+          "Audience Definitions": "List or modify GA4 audience definitions. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Create'/'Remove'. 4. Click 'Modify'.",
+          "Audience User Exports": "Process: 1. List audiences to get IDs. 2. Select audiences in sheet. 3. Click 'Create Audience Lists'. 4. Click 'Check States' until ready. 5. Click 'Export Data' to download.",
+          "Users": "List or modify user access permissions. To modify: 1. Run 'List'. 2. Edit roles. 3. Check 'Create'/'Update'/'Remove'. 4. Click 'Modify'.",
+          "Annotations": "List or modify property annotations. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Create'/'Update'/'Remove'. 4. Click 'Modify'.",
+          "Google Ads Links": "List or modify Google Ads integrations. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Create'/'Remove'. 4. Click 'Modify'.",
+          "AdSense Links": "List or modify AdSense integrations. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Create'/'Remove'. 4. Click 'Modify'.",
+          "BigQuery Links": "List or modify BigQuery integrations. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Create'/'Remove' (Note: BigQuery delete must be done in BigQuery console). 4. Click 'Modify'.",
+          "Firebase Links": "List or modify Firebase integrations. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Create'/'Remove'. 4. Click 'Modify'.",
+          "DV360 Links": "List or modify DV360 integrations. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Create'/'Update'/'Remove'. 4. Click 'Modify'.",
+          "SA360 Links": "List or modify SA360 integrations. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Create'/'Update'/'Remove'. 4. Click 'Modify'.",
+          "Subproperty Event Filters": "List or modify event filters for subproperties. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Create'/'Update'/'Remove'. 4. Click 'Modify'.",
+          "Rollup Property Source Links": "List or modify source links for rollup properties. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Create'/'Remove'. 4. Click 'Modify'.",
+          "Expanded Data Sets": "List or modify expanded data sets. To modify: 1. Run 'List'. 2. Edit sheet. 3. Check 'Create'/'Remove'. 4. Click 'Modify'.",
+          "User Access Report": "Run user access reports. Requires GA360 properties.",
+          "Easy Property Creation": "Process: 1. Click 'List Templates' to set up sheet. 2. Fill in template rows. 3. Click 'Create Properties' to bulk create.",
+          "Health Report": "Generate a configuration health report. Requires you to select properties/streams first.",
+          "Account Change History": "List administrative change history for selected GA4 accounts.",
+          "Enable Full Spreadsheet Menu": "Show all configuration sheets and options in the spreadsheet's top menu. If disabled, only shows 'Show Sidebar'.",
+          "Auto-Jump to Tab on Run": "Automatically activate and switch to the corresponding sheet tab when running a tool."
+        };
+
+        // Inject tooltips into group titles
+        const groupTitles = document.querySelectorAll('.group-title');
+        groupTitles.forEach(titleEl => {
+          try {
+            const jumpLink = titleEl.querySelector('.jump-link');
+            let name = '';
+            if (jumpLink) {
+              const clone = titleEl.cloneNode(true);
+              const cloneJumpLink = clone.querySelector('.jump-link');
+              if (cloneJumpLink) {
+                cloneJumpLink.remove();
+              }
+              name = clone.textContent.trim();
+            } else {
+              name = titleEl.textContent.trim();
+            }
+            
+            if (tooltips[name]) {
+              const textSpan = document.createElement('span');
+              textSpan.textContent = name + ' ';
+              
+              const infoIcon = document.createElement('span');
+              infoIcon.className = 'info-icon';
+              infoIcon.setAttribute('data-tooltip', tooltips[name]);
+              infoIcon.textContent = 'ⓘ';
+              
+              textSpan.appendChild(infoIcon);
+              
+              titleEl.innerHTML = '';
+              titleEl.appendChild(textSpan);
+              if (jumpLink) {
+                titleEl.appendChild(jumpLink);
+              }
+            }
+          } catch (err) {
+            console.error('Error injecting tooltip for: ' + titleEl.innerText, err);
+          }
+        });
+
+        // Inject tooltips into setting item labels
+        const settingSpans = document.querySelectorAll('.setting-item > span');
+        settingSpans.forEach(spanEl => {
+          try {
+            const name = spanEl.textContent.trim();
+            if (tooltips[name]) {
+              const infoIcon = document.createElement('span');
+              infoIcon.className = 'info-icon';
+              infoIcon.setAttribute('data-tooltip', tooltips[name]);
+              infoIcon.textContent = 'ⓘ';
+              spanEl.appendChild(infoIcon);
+            }
+          } catch (err) {
+            console.error('Error injecting tooltip for setting: ' + spanEl.innerText, err);
+          }
+        });
+
+        // Initialize settings
+        google.script.run
+          .withSuccessHandler(function(mode) {
+            document.getElementById('toggle-full-menu').checked = (mode === 'full');
+          })
+          .getMenuMode();
+          
+        google.script.run
+          .withSuccessHandler(function(enabled) {
+            document.getElementById('toggle-auto-jump').checked = enabled;
+          })
+          .getAutoJump();
+      });
+
+      function toggleFullMenu(checked) {
+        const mode = checked ? 'full' : 'simplified';
+        google.script.run.setMenuMode(mode);
+      }
+
+      function toggleAutoJump(checked) {
+        google.script.run.setAutoJump(checked);
+      }
+
+      function filterTools(query) {
+        query = query.toLowerCase();
+        const detailsElements = document.querySelectorAll('details');
+        
+        detailsElements.forEach(details => {
+          // Don't filter settings
+          const summaryEl = details.querySelector('summary');
+          if (summaryEl && summaryEl.innerText.trim() === 'Settings') {
+            return;
+          }
+          
+          let hasMatch = false;
+          const summaryText = summaryEl ? summaryEl.innerText.toLowerCase() : '';
+          if (summaryText.includes(query)) {
+            hasMatch = true;
+          }
+          
+          const groups = details.querySelectorAll('.group');
+          groups.forEach(group => {
+            const elements = group.querySelectorAll('.group-title, .action-btn');
+            elements.forEach(el => {
+              if (el.innerText.toLowerCase().includes(query)) {
+                hasMatch = true;
+              }
+            });
+          });
+          
+          if (hasMatch) {
+            details.style.display = '';
+            if (query.length > 1) {
+              details.open = true;
+            }
+          } else {
+            details.style.display = 'none';
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
+<!-- //--End update -->

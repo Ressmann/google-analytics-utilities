@@ -37,13 +37,13 @@ const sheetsMeta = {
         row: 2,
         column: 1,
         numRows: 1,
-        numColumns: 24
+        numColumns: 27
       },
       read: {
         row: 2,
         column: 1,
         numRows: 1,
-        numColumns: 28
+        numColumns: 31
       }
     },
     customDimensions: {
@@ -157,13 +157,13 @@ const sheetsMeta = {
         row: 2,
         column: 1,
         numRows: 1,
-        numColumns: 21
+        numColumns: 26
       },
       read: {
         row: 2,
         column: 1,
         numRows: 1,
-        numColumns: 25
+        numColumns: 30
       }
     },
     audiences: {
@@ -415,6 +415,21 @@ const sheetsMeta = {
         numColumns: 11
       }
     },
+    sKAdConversionSchemas: {
+      sheetName: 'sKAd Conversion Schemas',
+      write: {
+        row: 2,
+        column: 1,
+        numRows: 1,
+        numColumns: 11
+      },
+      read: {
+        row: 2,
+        column: 1,
+        numRows: 1,
+        numColumns: 15
+      }
+    },
     calculatedMetrics: {
       sheetName: 'Calculated Metrics',
       write: {
@@ -458,6 +473,36 @@ const sheetsMeta = {
         column: 1,
         numRows: 1,
         numColumns: 1
+      }
+    },
+    reportingDataAnnotations: {
+      sheetName: 'Annotations',
+      write: {
+        row: 2,
+        column: 1,
+        numRows: 1,
+        numColumns: 11
+      },
+      read: {
+        row: 2,
+        column: 1,
+        numRows: 1,
+        numColumns: 15
+      }
+    },
+    searchChangeHistoryEvents: {
+      sheetName: 'Account Change History',
+      write: {
+        row: 7,
+        column: 1,
+        numRows: 1,
+        numColumns: 7
+      },
+      read: {
+        row: 7,
+        column: 1,
+        numRows: 1,
+        numColumns: 7
       }
     }
   }

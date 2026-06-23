@@ -26,10 +26,17 @@ function listSelectedGA4Streams(properties) {
     if (dataStreamsResponse != undefined && dataStreamsResponse.length > 0) {
       dataStreamsResponse.forEach(stream => {
         let enhancedMeasurementSettings = {};
+        let dataRedactionSettings = {};
         if (stream.webStreamData) {
           enhancedMeasurementSettings = AnalyticsAdmin
             .Properties.DataStreams.getEnhancedMeasurementSettings(
               `${stream.name}/enhancedMeasurementSettings`);
+
+          try {
+            dataRedactionSettings = getGA4Resource('dataRedactionSettings', `${stream.name}/dataRedactionSettings`);
+            } catch(e) {
+              console.log("Redaction settings fetch failed: " + e);
+              }
         }
         const tempArray = [];
         tempArray.push(
@@ -57,7 +64,10 @@ function listSelectedGA4Streams(properties) {
           tempArray[20] = enhancedMeasurementSettings.pageChangesEnabled || false,
           tempArray[21] = enhancedMeasurementSettings.formInteractionsEnabled || false,
           tempArray[22] = enhancedMeasurementSettings.searchQueryParameter,
-          tempArray[23] = enhancedMeasurementSettings.uriQueryParameter
+          tempArray[23] = enhancedMeasurementSettings.uriQueryParameter,
+          tempArray[24] = dataRedactionSettings.emailRedactionEnabled || false,
+          tempArray[25] = dataRedactionSettings.urlParamsRedactionEnabled || false,
+          tempArray[26] = dataRedactionSettings.queryParameterKeys ? dataRedactionSettings.queryParameterKeys.join(', ') : ''
         } else if (stream.androidAppStreamData != undefined) {
           tempArray[8] = stream.androidAppStreamData.packageName || '';
           tempArray[10] = stream.androidAppStreamData.firebaseAppId || '';
@@ -65,6 +75,14 @@ function listSelectedGA4Streams(properties) {
           tempArray[9] = stream.iosAppStreamData.bundleId || '';
           tempArray[10] = stream.iosAppStreamData.firebaseAppId || '';
         }
+
+        // Ensure tempArray is padded to exactly 27 columns and undefined values are handled
+        for (let i = 0; i < 27; i++) {
+          if (tempArray[i] === undefined) {
+            tempArray[i] = '';
+          }
+        }
+
         dataStreams.push(tempArray);
       });
     }
