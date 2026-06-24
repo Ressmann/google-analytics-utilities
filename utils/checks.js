@@ -14,48 +14,6 @@
  * limitations under the License.
  */
 
-const messageText = {
-  newRelease: `
-    There is a new version of this tool available. Please use the latest version
-    of the tool by using the files on Github or making a copy of this spreadsheet:
-    https://docs.google.com/spreadsheets/d/1kJqwYNed8RTuAgjy0aRUooD__MIPqzUeiDF5LZ7v1aI/copy
-    
-    Update Details:
-  `
-}
-
-/**
- * Checks if this is the latest version of the script and sheet.
- * If not, it prompts the user to create a new copy of the sheet
- * from Github.
- */
-function checkRelease() {
-  const ui = SpreadsheetApp.getUi();
-  const settingsSheet = ss.getSheetByName('Settings');
-
-  // Get sheet version.
-  const rawReleaseVersion = settingsSheet.getRange(1, 2, 1, 1).getValue();
-  const sheetReleaseVersion = parseFloat(rawReleaseVersion.split('v')[1]);
-
-  // Get Github version.
-  const releases = JSON.parse(
-    UrlFetchApp.fetch(
-      'https://api.github.com/repos/google/google-analytics-utilities/releases'
-    ).getContentText());
-  const latestGithubRelease = releases[0];
-  const latestGithubVersion = parseFloat(
-    latestGithubRelease.tag_name.split('v')[1]);
-  
-  if (sheetReleaseVersion < latestGithubVersion) {
-    const title = 'Update Avilable';
-    const message = messageText.newRelease + latestGithubRelease.body + `
-  
-  ` + latestGithubRelease.html_url;
-    ui.alert(title, message, ui.ButtonSet.OK);
-  } else {
-    ui.alert('No updates avaialable.');
-  }
-}
 
 /**
  * Check if a write response has an error and returns error information or

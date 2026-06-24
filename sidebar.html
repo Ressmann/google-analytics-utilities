@@ -302,6 +302,77 @@
         opacity: 1;
         visibility: visible;
       }
+      .footer {
+        margin-top: 20px;
+        padding-top: 10px;
+        border-top: 1px solid var(--border-color);
+        color: var(--text-secondary);
+        font-size: 11px;
+        text-align: center;
+      }
+      /* Modal styles */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 2000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-content {
+        background-color: var(--bg-color);
+        padding: 16px;
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        width: 85%;
+        max-width: 280px;
+        box-sizing: border-box;
+      }
+      .modal-content h4 {
+        margin-top: 0;
+        margin-bottom: 8px;
+        color: var(--text-primary);
+        font-size: 14px;
+      }
+      .modal-content p {
+        margin-top: 0;
+        margin-bottom: 16px;
+        color: var(--text-secondary);
+        font-size: 12px;
+        line-height: 1.4;
+      }
+      .modal-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+      .modal-btn {
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        border: 1px solid transparent;
+      }
+      .primary-btn {
+        background-color: var(--primary-color);
+        color: white;
+      }
+      .primary-btn:hover {
+        background-color: var(--primary-hover);
+      }
+      .secondary-btn {
+        background-color: var(--surface-color);
+        color: var(--text-primary);
+        border-color: var(--border-color);
+      }
+      .secondary-btn:hover {
+        background-color: #eee;
+      }
     </style>
   </head>
   <body>
@@ -328,7 +399,7 @@
       </div>
 
         <div class="group-title">Global Settings</div>
-        <button class="action-btn" onclick="runFunc('listAllGA4PropertyResources')">List All Property Settings</button>
+        <button class="action-btn" onclick="showConfirmModal('List All Settings', 'This option will populate ALL tabs. It runs through all actions for all selected properties, which can take several minutes to finish. Do you want to proceed?', () => runFunc('listAllGA4PropertyResources'))">List All Property Settings</button>
       </div>
     </details>
 
@@ -542,12 +613,51 @@
             <span class="slider"></span>
           </label>
         </div>
-        <div class="group-title">System</div>
-        <button class="action-btn" onclick="runFunc('checkRelease')">Check for Updates</button>
       </div>
     </details>
 
+    <div id="confirm-modal" class="modal">
+      <div class="modal-content">
+        <h4 id="modal-title">Confirm Action</h4>
+        <p id="modal-message">Are you sure you want to proceed?</p>
+        <div class="modal-buttons">
+          <button id="modal-cancel-btn" class="modal-btn secondary-btn">Cancel</button>
+          <button id="modal-confirm-btn" class="modal-btn primary-btn">Proceed</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      Sheet created: <span id="created-date">Loading...</span>
+    </div>
+
     <script>
+      function showConfirmModal(title, message, onConfirm) {
+        const modal = document.getElementById('confirm-modal');
+        document.getElementById('modal-title').textContent = title;
+        document.getElementById('modal-message').textContent = message;
+        
+        const confirmBtn = document.getElementById('modal-confirm-btn');
+        const cancelBtn = document.getElementById('modal-cancel-btn');
+        
+        // Remove previous event listeners by cloning
+        const newConfirmBtn = confirmBtn.cloneNode(true);
+        const newCancelBtn = cancelBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+        
+        modal.style.display = 'flex';
+        
+        newConfirmBtn.addEventListener('click', () => {
+          modal.style.display = 'none';
+          onConfirm();
+        });
+        
+        newCancelBtn.addEventListener('click', () => {
+          modal.style.display = 'none';
+        });
+      }
+
       function runFunc(funcName, sheetName) {
         if (sheetName) {
           const autoJumpEnabled = document.getElementById('toggle-auto-jump').checked;
@@ -707,6 +817,16 @@
             document.getElementById('toggle-auto-jump').checked = enabled;
           })
           .getAutoJump();
+
+        google.script.run
+          .withSuccessHandler(function(dateString) {
+            document.getElementById('created-date').textContent = dateString;
+          })
+          .withFailureHandler(function(err) {
+            document.getElementById('created-date').textContent = 'Error';
+            console.error('Error fetching sheet creation date: ', err);
+          })
+          .getSheetCreatedDate();
       });
 
       function toggleFullMenu(checked) {
