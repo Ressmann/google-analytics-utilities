@@ -69,10 +69,6 @@ The script makes use of the following APIs/advanced app script services:
 
 If you are concerned about the access permissions required for the script, then please use [this sheet instead](https://docs.google.com/spreadsheets/d/1NUUS0LLz2dlPB2-hLS5hgbLad9akwM4bqaeZGZy2RCQ/copy). This sheet lacks some of the more advanced features, but it has more restricted scopes.
 
-## Check for Updates
-
-It is recommended to periodically run the "Check for Updates" menu item to see if a new version of the tool has been released.
-
 ## Features
 
 

@@ -27,6 +27,24 @@ const apiActionTaken = {
 };
 
 /**
+ * Gets the creation date of the active spreadsheet.
+ * @return {string} The creation date formatted.
+ */
+function getSheetCreatedDate() {
+  try {
+    const id = SpreadsheetApp.getActiveSpreadsheet().getId();
+    const file = DriveApp.getFileById(id);
+    const date = file.getDateCreated();
+    const timezone = SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone();
+    return Utilities.formatDate(date, timezone, 'yyyy-MM-dd');
+  } catch (e) {
+    Logger.log('Error getting creation date: ' + e.message);
+    return 'Unknown';
+  }
+}
+
+
+/**
  * Lists all values across all GA4 sheets.
  */
 function listAllGA4PropertyResources() {
@@ -156,6 +174,16 @@ function writeToSheet(data, sheetName) {
     sheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet(sheetName);
   }
   if (data.length > 0) {
+    const requiredRows = ranges.row + data.length - 1;
+    const maxRows = sheet.getMaxRows();
+    if (requiredRows > maxRows) {
+      sheet.insertRowsAfter(maxRows, requiredRows - maxRows);
+    }
+    const requiredCols = ranges.column + ranges.numColumns - 1;
+    const maxCols = sheet.getMaxColumns();
+    if (requiredCols > maxCols) {
+      sheet.insertColumnsAfter(maxCols, requiredCols - maxCols);
+    }
     sheet.getRange(ranges.row, ranges.column, data.length, ranges.numColumns)
          .setValues(data);
   }
@@ -172,16 +200,18 @@ function writeToSheet(data, sheetName) {
 function getDataFromSheet(sheetName) {
   const ranges = getSheetRange(sheetName, 'read');
   let sheet = ss.getSheetByName(sheetName);
-
-    console.log('getDataFromSheet: ', sheet.getRange(
+  if (!sheet) {
+    return [];
+  }
+  const lastRow = sheet.getLastRow();
+  if (lastRow < ranges.row) {
+    return [];
+  }
+  const values = sheet.getRange(
     ranges.row, ranges.column,
-    sheet.getLastRow() - ranges.row + 1, ranges.numColumns).getValues());
-
-  return sheet.getRange(
-    ranges.row, ranges.column,
-    sheet.getLastRow() - ranges.row + 1, ranges.numColumns).getValues();
-
-
+    lastRow - ranges.row + 1, ranges.numColumns).getValues();
+  console.log('getDataFromSheet (' + sheetName + '): ', values);
+  return values;
 }
 /**
  * Get selected properties from the account summaries sheet based
@@ -205,11 +235,14 @@ function writeActionTakenToSheet(sheetName, index, actionTaken) {
 	// The actual_row to be written to is offset from the index value by 2, so
 	// the index value must be increased by two.
 	const writeRow = index + 2;
-  const actionTakenColumn = ss.getSheetByName(sheetName).getLastColumn();
-	const numRows = 1;
-	const numColumns = 1;
-	ss.getSheetByName(sheetName).getRange(
-		writeRow, actionTakenColumn, numRows, numColumns
+  const sheet = ss.getSheetByName(sheetName);
+  const actionTakenColumn = sheet.getLastColumn();
+  const maxRows = sheet.getMaxRows();
+  if (writeRow > maxRows) {
+    sheet.insertRowsAfter(maxRows, writeRow - maxRows);
+  }
+	sheet.getRange(
+		writeRow, actionTakenColumn, 1, 1
 	).setValue(actionTaken);
 }
 
@@ -219,15 +252,19 @@ function writeActionTakenToSheet(sheetName, index, actionTaken) {
  */
 function clearSheetContent(sheetsMetaField) {
   const sheet = SpreadsheetApp.getActive().getSheetByName(sheetsMetaField.sheetName);
-    // Use the configured write row if it exists, otherwise default to 2
-    const startRow = (sheetsMetaField.write && sheetsMetaField.write.row) ? sheetsMetaField.write.row : 2;
-    // Calculate how many rows to clear (ensure we don't clear before row 1)
-    const numRowsToClear = Math.max(0, sheet.getLastRow() - startRow + 1);
-    
-    if (numRowsToClear > 0) {
-      sheet.getRange(startRow, 1, numRowsToClear, sheet.getLastColumn())
-      .clearContent();
-      }
+  if (!sheet) {
+    return;
+  }
+  // Use the configured write row if it exists, otherwise default to 2
+  const startRow = (sheetsMetaField.write && sheetsMetaField.write.row) ? sheetsMetaField.write.row : 2;
+  // Calculate how many rows to clear (ensure we don't clear before row 1)
+  const numRowsToClear = Math.max(0, sheet.getLastRow() - startRow + 1);
+  const lastColumn = Math.max(1, sheet.getLastColumn());
+  
+  if (numRowsToClear > 0) {
+    sheet.getRange(startRow, 1, numRowsToClear, lastColumn)
+         .clearContent();
+  }
 }
 
 /**
@@ -294,6 +331,7 @@ function resizeRowHeights(sheetName, rowHeight) {
  * selection purposes.
  */
 function writeDataStreamSelectionToSheet() {
+  clearSheetContent(sheetsMeta.ga4.dataStreamSelection);
   const streamArray = [];
   const selectedProperties = getSelectedGa4Properties();
   for (let i = 0; i < selectedProperties.length; i++) {

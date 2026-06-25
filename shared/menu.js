@@ -144,11 +144,9 @@ function createAnalyticsMenu(mode) {
           .addSubMenu(
             ui.createMenu('User Access Report')
             .addItem('Run Report', 'writeUserAccessReportDataToSheet')))
-        .addItem('List All Property Settings', 'listAllGA4PropertyResources')
+        .addItem('List All Property Settings', 'confirmAndListAllGA4PropertyResources')
       .addItem('List Account Change History', 'listAccountHistory')
-      .addSeparator();
-      
-    menu.addItem('Check for Updates', 'checkRelease');
+    
   } else {
     menu.addItem('Show Sidebar', 'showSidebar');
   }
@@ -195,5 +193,20 @@ function getAutoJump() {
     return PropertiesService.getUserProperties().getProperty('AUTO_JUMP') !== 'false'; // Default to true
   } catch (err) {
     return true;
+  }
+}
+
+/**
+ * Prompts user for confirmation before listing all GA4 resources.
+ */
+function confirmAndListAllGA4PropertyResources() {
+  const ui = SpreadsheetApp.getUi();
+  const response = ui.alert(
+    'List All Settings',
+    'This option will populate ALL tabs. It runs through all actions for all selected properties, which can take several minutes to finish. Do you want to proceed?',
+    ui.ButtonSet.YES_NO
+  );
+  if (response === ui.Button.YES) {
+    listAllGA4PropertyResources();
   }
 }
